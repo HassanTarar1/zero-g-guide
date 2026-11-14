@@ -16,7 +16,7 @@ export default function Advisor() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
-      <h2 className="font-display text-2xl font-black tracking-wide text-white">📋 Protocol Advisor</h2>
+      <h2 className="text-xl font-bold tracking-tight text-white">Protocol Advisor</h2>
       <p className="text-sm text-slate-400">
         Emergency & operations checklists for the moment when Earth can't answer. Built from publicly documented
         NASA/ISS procedures — a training aid, not official flight rules.

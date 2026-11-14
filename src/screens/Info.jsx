@@ -22,7 +22,7 @@ function NasaGallery() {
 
   return (
     <div className="mt-6">
-      <h3 className="font-bold text-white">🖼️ Live NASA Image Library (fetched now, no key required)</h3>
+      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Live NASA Image Library — fetched now, no key required</h3>
       {err && <p className="mt-2 text-sm text-slate-400">(Library unreachable right now — the game still works offline.)</p>}
       {!items && !err && <p className="mt-2 text-sm text-slate-400">Loading NASA images…</p>}
       {items && (
@@ -48,13 +48,13 @@ export default function Info({ tab, setTab, onBack }) {
           onClick={() => setTab('data')}
           className={`rounded-xl px-4 py-2 font-bold transition ${tab === 'data' ? 'bg-cyan-500 text-slate-950' : 'border border-slate-600 text-slate-300 hover:border-cyan-400'}`}
         >
-          📡 NASA Data Used
+          NASA data used
         </button>
         <button
           onClick={() => setTab('about')}
           className={`rounded-xl px-4 py-2 font-bold transition ${tab === 'about' ? 'bg-cyan-500 text-slate-950' : 'border border-slate-600 text-slate-300 hover:border-cyan-400'}`}
         >
-          ℹ️ About Zero-G Guide
+          About Zero-G Guide
         </button>
       </div>
 
@@ -95,7 +95,7 @@ export default function Info({ tab, setTab, onBack }) {
             </p>
           </div>
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
-            <h3 className="font-bold text-amber-300">🤖 Super Intelligence (SI) Disclosure</h3>
+            <h3 className="font-bold text-amber-300">Super Intelligence (SI) disclosure</h3>
             <p className="mt-2 text-sm">
               This project’s code was developed <span className="font-semibold">with the assistance of AI (large language model) tools</span> as
               permitted by the Space Apps Challenge rules. All simulation logic, UI and text were generated and then
@@ -105,7 +105,7 @@ export default function Info({ tab, setTab, onBack }) {
             </p>
           </div>
           <div className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-5">
-            <h3 className="font-bold text-white">🔭 Design notes</h3>
+            <h3 className="font-bold text-white">Design notes</h3>
             <ul className="mt-2 list-disc space-y-1 text-sm">
               <li>Consumables use ISS per-crew rates: 0.84 kg O₂/day, 3.5 L water/day, 1.83 kg food/day.</li>
               <li>Radiation uses Curiosity RAD (Mars ≈ 0.7 mSv/day) and LRO CRaTER (Moon ≈ 1.4 mSv/day) measurements, with NASA’s ~600 mSv career limit as a hard game-over.</li>

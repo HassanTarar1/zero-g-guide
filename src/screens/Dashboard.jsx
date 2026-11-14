@@ -10,7 +10,7 @@ function Card({ title, badge, children, className = '' }) {
   return (
     <div className={`rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 backdrop-blur ${className}`}>
       <div className="flex items-center justify-between gap-2">
-        <h3 className="font-display text-xs font-bold tracking-widest text-slate-300">{title}</h3>
+        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-300">{title}</h3>
         {badge}
       </div>
       <div className="mt-3">{children}</div>
@@ -97,7 +97,7 @@ function EvaGoNoGo({ noaa, flares, seps }) {
       <div className="flex flex-wrap items-center gap-5">
         <div className={`grid h-28 w-36 shrink-0 place-items-center rounded-xl border-2 ${styles[verdict]}`}>
           <div className="text-center">
-            <p className="font-display text-3xl font-black tracking-wider">{verdict}</p>
+            <p className="num text-3xl font-black tracking-wider">{verdict}</p>
             <p className="text-[10px] font-bold tracking-widest">FOR EVA OPS</p>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function Dashboard({ onInfo }) {
     <div className="mx-auto max-w-5xl px-4 py-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <h2 className="font-display text-2xl font-black tracking-wide text-white">Ops Dashboard</h2>
+          <h2 className="text-xl font-bold tracking-tight text-white">Ops Dashboard</h2>
           <p className="text-sm text-slate-400">Live mission-environment picture for the crew.</p>
         </div>
         <p className="text-[10px] text-slate-500">

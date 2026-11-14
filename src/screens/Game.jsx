@@ -51,8 +51,7 @@ function Modal({ children }) {
   )
 }
 
-export default function Game({ sim, setSim, onQuit }) {
-  const [showShop, setShowShop] = useState(true)
+export default function Game({ sim, setSim, onQuit }) {  const [showShop, setShowShop] = useState(true)
   const [auto, setAuto] = useState(false)
   const [tip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)])
   const simRef = useRef(sim)
@@ -60,6 +59,7 @@ export default function Game({ sim, setSim, onQuit }) {
 
   const loc = LOCATIONS[sim.locationKey]
   const paused = sim.pendingEvent || sim.pendingQuiz || sim.lastEventResult || sim.lastQuizResult
+  const stripIcon = (s) => (s ? s.replace(/^[^\p{L}\p{N}]+/u, '') : s)
 
   // Auto-fly: advance a sol every ~1.1s; stop when a decision is needed.
   useEffect(() => {
@@ -95,11 +95,11 @@ export default function Game({ sim, setSim, onQuit }) {
       <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-display text-xl font-black tracking-wide text-white">{loc.flag} {loc.name}</h1>
+            <h1 className="text-lg font-bold tracking-tight text-white">{loc.name}</h1>
             <p className="text-sm text-slate-400">
-              {loc.solLabel} <span className="font-bold text-cyan-300">{Math.min(sim.sol, loc.missionSols)}</span> / {loc.missionSols} ·
-              Crew: {sim.crew} 🧑‍🚀 · ☢️ dose {Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv
-              {sim.stormSols > 0 && <span className="ml-2 font-bold text-amber-300">🌪️ storm: {sim.stormSols} sols left</span>}
+              {loc.solLabel} <span className="num font-bold text-cyan-300">{Math.min(sim.sol, loc.missionSols)}</span> / {loc.missionSols} ·
+              Crew: {sim.crew} · Dose: <span className="num">{Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv</span>
+              {sim.stormSols > 0 && <span className="num ml-2 font-bold text-amber-300">· STORM {sim.stormSols} SOLS</span>}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export default function Game({ sim, setSim, onQuit }) {
           <h3 className="font-bold text-white">📋 Mission Log</h3>
           <div className="mt-2 max-h-72 space-y-1 overflow-y-auto pr-1 text-xs leading-relaxed text-slate-300">
             {sim.log.map((l, i) => (
-              <p key={i} className={i === 0 ? 'text-cyan-200' : 'text-slate-400'}>{l}</p>
+              <p key={i} className={i === 0 ? 'text-cyan-200' : 'text-slate-400'}>{stripIcon(l)}</p>
             ))}
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function Game({ sim, setSim, onQuit }) {
             <button
               onClick={() => setSim(tick(sim))}
               disabled={paused}
-              className="glow-cyan col-span-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 py-4 font-display text-2xl font-black tracking-wide text-slate-950 transition hover:scale-[1.02] hover:from-cyan-300 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+              className="col-span-2 rounded bg-cyan-500 py-4 text-xl font-bold tracking-tight text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {paused ? '⏸️ Decision pending…' : `▶ Fly Next ${loc.solLabel}`}
             </button>
@@ -181,7 +181,7 @@ export default function Game({ sim, setSim, onQuit }) {
             >
               🎉 Movie Night −10cr
             </button>
-            <p className="col-span-2 px-1 text-xs text-slate-500">{tip}</p>
+            <p className="col-span-2 px-1 text-[11px] text-slate-500">{stripIcon(tip)}</p>
           </div>
 
           {/* Shop */}
@@ -221,16 +221,16 @@ export default function Game({ sim, setSim, onQuit }) {
       {/* Event modal */}
       {sim.pendingEvent && (
         <Modal>
-          <h3 className="text-2xl font-black text-white">{sim.pendingEvent.title}</h3>
+          <h3 className="text-lg font-bold text-white">{stripIcon(sim.pendingEvent.title)}</h3>
           <p className="mt-2 text-slate-300">{sim.pendingEvent.text}</p>
           <div className="mt-5 space-y-3">
             {sim.pendingEvent.choices.map((c, i) => (
               <button
                 key={i}
                 onClick={() => { setAuto(false); setSim(resolveEvent(sim, i)) }}
-                className="w-full rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 text-left font-semibold text-cyan-200 transition hover:bg-cyan-500/25"
+                className="w-full rounded border border-slate-600 bg-slate-800/40 px-4 py-3 text-left text-sm font-semibold text-slate-200 transition hover:border-cyan-500/60 hover:text-cyan-200"
               >
-                {c.label}
+                {stripIcon(c.label)}
               </button>
             ))}
           </div>
@@ -240,7 +240,7 @@ export default function Game({ sim, setSim, onQuit }) {
       {/* Event result */}
       {sim.lastEventResult && !sim.pendingEvent && (
         <Modal>
-          <h3 className="text-xl font-black text-amber-300">{sim.lastEventResult.title} — outcome</h3>
+          <h3 className="text-base font-bold text-amber-300">{stripIcon(sim.lastEventResult.title)} — outcome</h3>
           <p className="mt-3 text-slate-200">{sim.lastEventResult.text}</p>
           <button
             onClick={() => setSim({ ...sim, lastEventResult: null })}
@@ -254,8 +254,8 @@ export default function Game({ sim, setSim, onQuit }) {
       {/* Quiz modal */}
       {sim.pendingQuiz && !sim.pendingEvent && !sim.lastEventResult && (
         <Modal>
-          <span className="rounded-full bg-lime-500/15 px-3 py-1 text-xs font-bold text-lime-300">🎓 MISSION ACADEMY</span>
-          <h3 className="mt-3 text-xl font-black text-white">{sim.pendingQuiz.q}</h3>
+          <span className="rounded-sm border border-lime-500/40 bg-lime-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-lime-300">Knowledge check</span>
+          <h3 className="mt-3 text-lg font-bold text-white">{sim.pendingQuiz.q}</h3>
           <div className="mt-4 space-y-2">
             {sim.pendingQuiz.options.map((o, i) => (
               <button
@@ -274,8 +274,8 @@ export default function Game({ sim, setSim, onQuit }) {
       {/* Quiz result */}
       {sim.lastQuizResult && !sim.pendingQuiz && !sim.lastEventResult && (
         <Modal>
-          <h3 className={`text-2xl font-black ${sim.lastQuizResult.correct ? 'text-lime-400' : 'text-amber-300'}`}>
-            {sim.lastQuizResult.correct ? '✅ Correct! +20 credits, +10 morale' : '📚 Good try, cadet!'}
+          <h3 className={`text-lg font-bold ${sim.lastQuizResult.correct ? 'text-lime-400' : 'text-amber-300'}`}>
+            {sim.lastQuizResult.correct ? 'Correct — +20 credits, +10 morale' : 'Review needed'}
           </h3>
           <p className="mt-3 text-slate-300">{sim.lastQuizResult.why}</p>
           <button

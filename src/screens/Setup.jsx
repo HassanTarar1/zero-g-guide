@@ -19,7 +19,7 @@ export default function Setup({ onBack, onLaunch }) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <button onClick={onBack} className="text-sm text-slate-400 hover:text-cyan-300">← Back</button>
-      <h1 className="font-display mt-2 text-3xl font-black tracking-wide text-white">Mission Setup</h1>
+      <h1 className="mt-2 text-xl font-bold tracking-tight text-white">Mission Setup</h1>
       <p className="text-slate-400">Choose your outpost, then spend {CONSUMPTION.setupCredits} starting credits on hardware.</p>
 
       {/* Location picker */}
@@ -33,9 +33,11 @@ export default function Setup({ onBack, onLaunch }) {
             }`}
           >
             <div className="flex items-center gap-4">
-              <div className={`h-16 w-16 shrink-0 rounded-full ${l.key === 'mars' ? 'planet-mars' : 'planet-moon'}`} />
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded border border-slate-700 bg-slate-950/60 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                {l.key}
+              </div>
               <div>
-                <h3 className="font-display text-lg font-bold tracking-wide text-white">{l.name}</h3>
+                <h3 className="text-base font-bold text-white">{l.name}</h3>
                 <p className="mt-1 text-sm text-slate-300">{l.blurb}</p>
               </div>
             </div>
@@ -50,9 +52,9 @@ export default function Setup({ onBack, onLaunch }) {
       </div>
 
       {/* Module shop */}
-      <h2 className="mt-8 text-xl font-bold text-white">🔧 Build your starting base</h2>
+      <h2 className="mt-8 text-base font-bold text-white">Base configuration</h2>
       <p className="mt-1 text-sm text-amber-300">
-        👶 Beginner tip: 2× Solar Array + 1× Water Recycler (95 cr) is a solid start — add a ☢️ RTG or ⚗️ O₂ Generator once you earn more credits.
+        Recommended starting loadout: 2× Solar Array + 1× Water Recycler (95 cr) — add an RTG or O₂ Generator once you earn credits.
       </p>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         {Object.values(MODULES).map((m) => (
@@ -89,9 +91,9 @@ export default function Setup({ onBack, onLaunch }) {
         <button
           onClick={() => onLaunch(locationKey, modules, creditsLeft)}
           disabled={creditsLeft < 0}
-          className="glow-amber rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-3 font-display text-lg font-black tracking-wide text-slate-950 transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+          className="rounded bg-cyan-500 px-8 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-400 disabled:opacity-40"
         >
-          🚀 Launch Mission
+          Launch mission
         </button>
       </div>
     </div>
