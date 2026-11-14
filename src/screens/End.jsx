@@ -9,7 +9,7 @@ export default function End({ sim, onRestart, onHome, onInfo }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 text-center">
       <div className="text-7xl">{won ? '🏅' : '🆘'}</div>
-      <h1 className={`mt-3 text-4xl font-black ${won ? 'text-lime-400' : 'text-rose-400'}`}>
+      <h1 className={`font-display mt-3 text-4xl font-black tracking-wide ${won ? 'text-lime-400' : 'text-rose-400'}`}>
         {won ? 'Mission Complete, Commander!' : 'Mission Aborted'}
       </h1>
       <p className="mt-2 text-slate-300">

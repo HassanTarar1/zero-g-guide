@@ -4,18 +4,41 @@ import { tick, buildModule, resolveEvent, answerQuiz, orderResupply, crewParty, 
 
 function Gauge({ icon, label, value, max, unit, danger }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100))
-  const color = pct > 50 ? 'bg-lime-400' : pct > 25 ? 'bg-amber-400' : 'bg-rose-500'
+  const C = 2 * Math.PI * 26
+  const color = pct > 50 ? '#a3e635' : pct > 25 ? '#fbbf24' : '#f43f5e'
   return (
-    <div className={`rounded-xl border border-slate-700/60 bg-slate-900/70 p-3 backdrop-blur ${danger ? 'alert-pulse' : ''}`}>
-      <div className="flex items-baseline justify-between">
-        <span className="text-xs font-semibold text-slate-400">{icon} {label}</span>
-        <span className={`text-sm font-black ${danger ? 'text-rose-400' : 'text-white'}`}>
-          {Math.max(0, Math.round(value))}<span className="text-[10px] font-semibold text-slate-500">{unit}</span>
-        </span>
+    <div className={`flex flex-col items-center rounded-xl border border-slate-700/60 bg-slate-900/70 p-2.5 backdrop-blur ${danger ? 'alert-pulse' : ''}`}>
+      <div className="relative h-16 w-16">
+        <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="#1e293b" strokeWidth="6" />
+          <circle
+            cx="32" cy="32" r="26" fill="none" stroke={color} strokeWidth="6"
+            strokeDasharray={`${(C * pct) / 100} ${C}`} strokeLinecap="round"
+            className="transition-all duration-500"
+          />
+        </svg>
+        <span className="absolute inset-0 grid place-items-center text-xl">{icon}</span>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
-        <div className={`h-full rounded-full transition-all duration-500 ${color}`} style={{ width: `${pct}%` }} />
-      </div>
+      <p className="mt-1 text-[11px] font-semibold text-slate-400">{label}</p>
+      <p className={`text-sm font-black ${danger ? 'text-rose-400' : 'text-white'}`}>
+        {Math.max(0, Math.round(value))}<span className="text-[10px] font-semibold text-slate-500">{unit}</span>
+      </p>
+    </div>
+  )
+}
+
+/** Planet-horizon backdrop for the active mission. */
+function Scene({ locationKey }) {
+  const mars = locationKey === 'mars'
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className={`absolute inset-0 bg-gradient-to-b ${mars ? 'from-[#0b1026] via-[#150d0c] to-[#2b130c]' : 'from-[#0b1026] via-[#0d1226] to-[#1e293b]'}`} />
+      <div
+        className={`absolute -bottom-[62%] left-1/2 h-[80vh] w-[170vw] -translate-x-1/2 rounded-[100%] ${
+          mars ? 'bg-gradient-to-b from-[#b45309] via-[#7c2d12] to-[#431407]' : 'bg-gradient-to-b from-[#475569] via-[#1e293b] to-[#0f172a]'
+        }`}
+        style={{ boxShadow: '0 -30px 90px rgba(0,0,0,.65)' }}
+      />
     </div>
   )
 }
@@ -67,14 +90,15 @@ export default function Game({ sim, setSim, onQuit }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
+      <Scene locationKey={sim.locationKey} />
       {/* Header */}
       <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-black text-white">{loc.flag} {loc.name}</h1>
+            <h1 className="font-display text-xl font-black tracking-wide text-white">{loc.flag} {loc.name}</h1>
             <p className="text-sm text-slate-400">
               {loc.solLabel} <span className="font-bold text-cyan-300">{Math.min(sim.sol, loc.missionSols)}</span> / {loc.missionSols} ·
-              Crew: {sim.crew} · ☢️ dose {Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv
+              Crew: {sim.crew} 🧑‍🚀 · ☢️ dose {Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv
               {sim.stormSols > 0 && <span className="ml-2 font-bold text-amber-300">🌪️ storm: {sim.stormSols} sols left</span>}
             </p>
           </div>
@@ -129,7 +153,7 @@ export default function Game({ sim, setSim, onQuit }) {
             <button
               onClick={() => setSim(tick(sim))}
               disabled={paused}
-              className="col-span-2 rounded-2xl bg-cyan-500 py-4 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:scale-[1.02] hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+              className="glow-cyan col-span-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 py-4 font-display text-2xl font-black tracking-wide text-slate-950 transition hover:scale-[1.02] hover:from-cyan-300 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
             >
               {paused ? '⏸️ Decision pending…' : `▶ Fly Next ${loc.solLabel}`}
             </button>

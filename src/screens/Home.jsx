@@ -26,10 +26,10 @@ export default function Home({ onStart, onInfo, onAbout }) {
       {/* Hero */}
       <div className="text-center">
         <div className="mb-4 text-7xl animate-float-rocket">🚀</div>
-        <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
-          Zero-G <span className="text-cyan-400">Guide</span>
+        <h1 className="font-display text-4xl font-black tracking-widest sm:text-6xl">
+          <span className="text-gradient">ZERO-G GUIDE</span>
         </h1>
-        <p className="mt-2 text-lg font-semibold text-amber-300">Junior Astronaut Mission Trainer</p>
+        <p className="mt-2 font-display text-lg font-bold tracking-wide text-amber-300">JUNIOR ASTRONAUT MISSION TRAINER</p>
         <p className="mx-auto mt-4 max-w-2xl text-slate-300">
           Cadet — your mission is to run a <span className="text-white font-semibold">real NASA-data-powered outpost</span> on
           the Moon or Mars. Balance <span className="text-cyan-300">life support</span>, <span className="text-amber-300">power</span>,{' '}
@@ -39,7 +39,7 @@ export default function Home({ onStart, onInfo, onAbout }) {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={onStart}
-            className="rounded-xl bg-cyan-500 px-8 py-4 text-lg font-bold text-slate-950 shadow-lg shadow-cyan-500/30 transition hover:scale-105 hover:bg-cyan-400"
+            className="glow-cyan rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-display text-lg font-black tracking-wide text-slate-950 transition hover:scale-105"
           >
             ▶ Start Mission Training
           </button>

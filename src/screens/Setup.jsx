@@ -19,7 +19,7 @@ export default function Setup({ onBack, onLaunch }) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <button onClick={onBack} className="text-sm text-slate-400 hover:text-cyan-300">← Back</button>
-      <h1 className="mt-2 text-3xl font-black text-white">Mission Setup</h1>
+      <h1 className="font-display mt-2 text-3xl font-black tracking-wide text-white">Mission Setup</h1>
       <p className="text-slate-400">Choose your outpost, then spend {CONSUMPTION.setupCredits} starting credits on hardware.</p>
 
       {/* Location picker */}
@@ -32,9 +32,13 @@ export default function Setup({ onBack, onLaunch }) {
               locationKey === l.key ? 'border-cyan-400 bg-cyan-500/10 ring-2 ring-cyan-400/40' : 'border-slate-700 bg-slate-900/60 hover:border-slate-500'
             }`}
           >
-            <div className="text-3xl">{l.flag}</div>
-            <h3 className="mt-1 text-lg font-bold text-white">{l.name}</h3>
-            <p className="mt-1 text-sm text-slate-300">{l.blurb}</p>
+            <div className="flex items-center gap-4">
+              <div className={`h-16 w-16 shrink-0 rounded-full ${l.key === 'mars' ? 'planet-mars' : 'planet-moon'}`} />
+              <div>
+                <h3 className="font-display text-lg font-bold tracking-wide text-white">{l.name}</h3>
+                <p className="mt-1 text-sm text-slate-300">{l.blurb}</p>
+              </div>
+            </div>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
               <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">☀️ sunlight ×{l.solarFactor}</span>
               <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">☢️ {l.radiationMSvPerDay} mSv/day</span>
@@ -85,7 +89,7 @@ export default function Setup({ onBack, onLaunch }) {
         <button
           onClick={() => onLaunch(locationKey, modules, creditsLeft)}
           disabled={creditsLeft < 0}
-          className="rounded-xl bg-amber-400 px-8 py-3 text-lg font-black text-slate-950 shadow-lg shadow-amber-400/25 transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+          className="glow-amber rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-3 font-display text-lg font-black tracking-wide text-slate-950 transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
         >
           🚀 Launch Mission
         </button>
