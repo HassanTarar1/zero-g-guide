@@ -501,6 +501,30 @@ export const SOURCES = [
     used: 'Consumables: 0.84 kg O₂, 3.5 L water, 1.83 kg food per crew-day',
   },
   {
+    kind: 'nasa',
+    name: 'NASA/JPL Opportunity rover — dust storm operations',
+    url: 'https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/',
+    used: 'Game card: dust on solar panels',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA Veggie — plant growth on the ISS',
+    url: 'https://science.nasa.gov/mission/veggie/',
+    used: 'Game card: crops and grow-lamp power',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA Deep Space Network — deep-space communications',
+    url: 'https://www.nasa.gov/communicating-with-missions/dsn/',
+    used: 'Game card: antenna pointing, light-time delay',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA Apollo Lunar Surface Journal — seismometers on the Moon',
+    url: 'https://www.nasa.gov/history/alsj/',
+    used: 'Game card: moonquakes',
+  },
+  {
     kind: 'partner',
     name: 'NOAA SWPC — alerts, watches and warnings',
     url: 'https://services.swpc.noaa.gov/products/alerts.json',

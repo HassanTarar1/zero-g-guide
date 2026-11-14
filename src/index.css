@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
 
   /* Hard edges everywhere — no pill/card radius */
   --radius: 0px;
@@ -139,4 +140,89 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Play screen — a printed field manual on warm paper, not a dashboard */
+/* ------------------------------------------------------------------ */
+
+.play-surface {
+  background: #f1ebdd;
+  color: #1c1a16;
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.play-surface ::selection {
+  background: #1c1a16;
+  color: #f1ebdd;
+}
+
+.play-surface :focus-visible {
+  outline: 2px solid #1c1a16;
+  outline-offset: 2px;
+}
+
+.play-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #6b6455;
+}
+
+.play-card {
+  background: #fbf7ec;
+  border: 2px solid #1c1a16;
+  box-shadow: 6px 6px 0 #1c1a16;
+}
+
+.play-choice {
+  border: 2px solid #1c1a16;
+  background: #fbf7ec;
+  color: #1c1a16;
+  box-shadow: 3px 3px 0 #1c1a16;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.play-choice:hover {
+  background: #efe4cf;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #1c1a16;
+}
+
+.play-choice:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #1c1a16;
+}
+
+.play-track {
+  height: 14px;
+  background: #ddd2bd;
+  border: 1.5px solid #1c1a16;
+  overflow: hidden;
+}
+
+.play-fill {
+  height: 100%;
+  transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.play-next {
+  border: 2px solid #1c1a16;
+  box-shadow: 4px 4px 0 #a89d87;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.play-next:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #a89d87;
+}
+
+.play-next:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #a89d87;
 }

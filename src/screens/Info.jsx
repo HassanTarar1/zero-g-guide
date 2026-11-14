@@ -73,8 +73,8 @@ export default function Info({ tab, setTab, onBack }) {
           <div className="mt-5">
             <p className="max-w-[82ch] text-[13px] leading-relaxed text-slate-400">
               Values in this application come from two places: live fetches from the endpoints below, and arithmetic
-              on published measurements. No number in the scenario model is invented. Where a feed is unavailable the
-              interface reports it instead of substituting a value.
+              on published measurements. No number in the game's daily costs or card effects is invented. Where a
+              feed is unavailable the interface reports it instead of substituting a value.
             </p>
 
             {GROUPS.map(([kind, title]) => {
@@ -115,22 +115,24 @@ export default function Info({ tab, setTab, onBack }) {
             <section>
               <h2 className="kicker">What this is</h2>
               <p className="mt-2 max-w-[82ch] text-[13px] leading-relaxed text-slate-400">
-                Zero-G Guide is a browser-based decision aid for crews operating where Earth cannot answer in time.
-                It reduces live space-weather measurements, crew dose state and computed light-time into a prioritized
-                advisory log. Each advisory carries its source, its evidence and the actions to take. The same
-                constraints drive a training scenario in which the crew resolves events without a real-time link.
+                Zero-G Guide is a ten-day outpost game for ages 4–14. Each day presents one decision. Every choice costs
+                air, power or radiation, and the mission ends when one of them runs out. The solar-storm decision is
+                priced against live NOAA proton flux and flare data, so the risk the player sees is today's risk.
+                Behind the game, the same measurements drive a mission console for older players and judges: a
+                prioritized advisory log, a dose ledger and eight emergency procedures.
               </p>
             </section>
 
             <section>
               <h2 className="kicker">Method</h2>
               <ul className="mt-2 max-w-[82ch] list-disc space-y-1 pl-5 text-[12.5px] leading-relaxed text-slate-400">
+                <li>The ten-day game charges 5 air and 3 power every day for life support and heat, then applies the chosen card. Radiation accumulates, with a ×1.3 lunar multiplier. The solar-storm card's exposure cost rises 90% when NOAA reports proton flux at or above 10 pfu or an X-class flare inside 24 hours.</li>
                 <li>Earth–Mars and Earth–Moon light-time is computed from low-precision orbital elements (Schlyter), accurate to roughly 1% over 2000–2100, and divided by the speed of light.</li>
                 <li>Proton flux above 10 pfu at ≥10 MeV is treated as the S1 threshold. Flare class, Kp and SWPC alerts are read live and never cached longer than five minutes.</li>
                 <li>Consumables use ISS per-crew rates: 0.84 kg O₂, 3.5 L water and 1.83 kg food per crew-day.</li>
                 <li>Radiation uses Curiosity RAD at Mars (0.7 mSv/sol) and LRO CRaTER at the Moon (1.4 mSv/sol), against an approximate 600 mSv career limit.</li>
                 <li>Shielding transmission values are illustrative ranges from published NASA shielding studies, not a transport calculation.</li>
-                <li>Scenario events follow documented hazards: dust storms, solar particle events, micrometeoroid strikes and moonquakes recorded by Apollo seismometers.</li>
+                <li>Scenario cards follow documented hazards: dust storms, solar particle events, micrometeoroid strikes and moonquakes recorded by Apollo seismometers.</li>
               </ul>
             </section>
 
