@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CONSUMPTION } from '../data/nasaData'
-import { fetchSolarFlares, timeAgo, cachedFetch } from '../lib/astro'
+import { fetchGoesFlares, timeAgo, cachedFetch } from '../lib/astro'
 
 const LIMIT = CONSUMPTION.radiationCareerLimitMSv
 const STORE_KEY = 'zgg-dose-log'
@@ -77,7 +77,7 @@ export default function Radiation() {
   useEffect(() => {
     let cancelled = false
     const ctrl = new AbortController()
-    cachedFetch('flr30', () => fetchSolarFlares(30, ctrl.signal))
+    cachedFetch('goesfl', () => fetchGoesFlares(ctrl.signal))
       .then((f) => { if (!cancelled) setFlares(f) })
       .catch(() => { if (!cancelled) setFlares('err') })
     return () => { cancelled = true; ctrl.abort() }
@@ -132,12 +132,16 @@ export default function Radiation() {
   const recentBigFlare = flares && flares !== 'err' && flares.length && /X|M/.test(flares[0].classType)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="text-xl font-bold tracking-tight text-white">Radiation Manager</h2>
-      <p className="mt-1 max-w-3xl text-sm text-slate-400">
-        Cumulative dose against NASA's career limit, with measured environments and shielding trade-offs.
-        Dose rates: Mars ≈ 0.7 mSv/sol (Curiosity RAD), Moon ≈ 1.4 mSv/sol (LRO CRaTER), ISS ≈ 0.5 mSv/sol.
-      </p>
+    <div className="px-5 py-5">
+      <div className="max-w-6xl">
+        <p className="kicker">Radiation / Dose control</p>
+        <div className="mt-1 border-b border-slate-700 pb-3">
+          <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">Career dose and shielding</h1>
+          <p className="mt-1 max-w-[80ch] text-[12.5px] leading-relaxed text-slate-500">
+            Dose against the ~600 mSv career limit, using measured environments. Mars 0.7 mSv/sol (Curiosity RAD),
+            Moon 1.4 mSv/sol (LRO CRaTER), ISS 0.5 mSv/sol.
+          </p>
+        </div>
 
       {recentBigFlare && (
         <div className="mt-4 rounded border border-amber-500/40 bg-amber-500/5 px-4 py-3">
@@ -364,6 +368,7 @@ export default function Radiation() {
             <li><span className="font-semibold text-slate-200">Aluminum is not a GCR solution.</span> Secondary neutrons from metal shielding can raise effective dose — mass and hydrogen-rich layers win.</li>
           </ul>
         </Section>
+      </div>
       </div>
     </div>
   )

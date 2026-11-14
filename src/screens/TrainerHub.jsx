@@ -2,51 +2,52 @@ import { LOCATIONS } from '../data/nasaData'
 
 export default function TrainerHub({ onStart, onInfo }) {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
-      <h2 className="text-xl font-bold tracking-tight text-white">Comm-Delay Simulation</h2>
-      <p className="mt-1 max-w-3xl text-sm text-slate-400">
-        A scenario exercise in autonomous decision-making. When Earth is minutes away, crews must make resource and
-        radiation calls alone. Every constraint below is drawn from the same data as the operational modules.
-      </p>
+    <div className="px-5 py-5">
+      <div className="max-w-4xl">
+        <p className="kicker">Simulation / Comm-delay drill</p>
+        <div className="mt-1 border-b border-slate-700 pb-3">
+          <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">Resource and radiation exercise</h1>
+          <p className="mt-1 max-w-[80ch] text-[12.5px] leading-relaxed text-slate-500">
+            A scenario in autonomous decision-making. Life support, power, food and shielding are drawn down at
+            published rates; events interrupt the plan. The crew resolves them without a real-time link, then reads
+            the outcome.
+          </p>
+        </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        {Object.values(LOCATIONS).map((l) => (
-          <div key={l.key} className="rounded border border-slate-800 bg-[#0c1220] p-5">
-            <div className="flex items-baseline justify-between">
-              <h3 className="text-base font-bold text-white">{l.name}</h3>
-              <span className="num text-[10px] uppercase tracking-widest text-slate-500">{l.missionSols} sols</span>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-slate-800 bg-slate-800 text-center">
-              <div className="bg-slate-950/60 px-2 py-1.5">
-                <p className="text-[9px] uppercase tracking-widest text-slate-500">Dose rate</p>
-                <p className="num text-xs font-bold text-slate-200">{l.radiationMSvPerDay} mSv/sol</p>
+        <h2 className="kicker mt-4">Select a station</h2>
+        <div className="mt-1.5 border-t border-slate-700">
+          {Object.values(LOCATIONS).map((l) => (
+            <div key={l.key} className="border-b border-slate-800 py-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-[13px] font-semibold text-slate-100">{l.name}</h3>
+                <span className="num text-[10px] text-slate-600">{l.missionSols} SOLS</span>
               </div>
-              <div className="bg-slate-950/60 px-2 py-1.5">
-                <p className="text-[9px] uppercase tracking-widest text-slate-500">Surface sunlight</p>
-                <p className="num text-xs font-bold text-slate-200">×{l.solarFactor}</p>
+              <p className="mt-1 max-w-[78ch] text-[12px] leading-relaxed text-slate-400">{l.blurb}</p>
+              <div className="num mt-1.5 flex flex-wrap gap-x-5 gap-y-0.5 text-[10.5px] text-slate-500">
+                <span>DOSE {l.radiationMSvPerDay} mSv/sol</span>
+                <span>SURFACE SUN ×{l.solarFactor}</span>
+                <span>LIGHT TIME {l.key === 'mars' ? '4–22 min' : '<1 s'}</span>
               </div>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-slate-400">{l.blurb}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="mt-4 rounded border border-slate-800 bg-[#0c1220] p-5">
-        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Training objectives</h3>
-        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-400">
-          <li>Balance life support, power, radiation shielding and food — the four budgets of every real outpost.</li>
-          <li>Respond to solar particle events, dust storms, micrometeoroid strikes and moonquakes under comm delay.</li>
-          <li>Learn the procedure behind each decision in the Protocol Advisor.</li>
-          <li>Every knowledge check uses verified NASA science; wrong answers carry a full explanation.</li>
+        <h2 className="kicker mt-5">Training objectives</h2>
+        <ul className="mt-1.5 max-w-[80ch] list-disc space-y-1 pl-5 text-[12.5px] leading-relaxed text-slate-400">
+          <li>Balance the four budgets of an outpost: life support, power, radiation and food.</li>
+          <li>Resolve solar particle events, dust storms, micrometeoroid strikes and moonquakes without Earth support.</li>
+          <li>Read the procedure behind each decision; every knowledge check cites a NASA measurement.</li>
+          <li>Finish 100 sols without exhausting consumables, power or the crew dose budget.</li>
         </ul>
-        <div className="mt-5 flex flex-wrap items-center gap-4">
+
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-800 pt-4">
           <button
             onClick={onStart}
-            className="rounded bg-cyan-500 px-6 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-400"
+            className="bg-cyan-500 px-4 py-2 text-[12px] font-semibold text-slate-950 transition hover:bg-cyan-400"
           >
             Begin scenario
           </button>
-          <button onClick={onInfo} className="text-xs font-semibold text-slate-400 hover:text-cyan-400">
+          <button onClick={onInfo} className="text-[11px] text-slate-500 hover:text-slate-300">
             Data sources →
           </button>
         </div>

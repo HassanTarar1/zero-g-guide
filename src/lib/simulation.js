@@ -15,7 +15,7 @@ export function createInitialState(locationKey, modules, creditsLeft) {
     totalDose: 0,
     stormSols: 0,
     modules: { solar: 0, rtg: 0, battery: 0, recycler: 0, greenhouse: 0, shelter: 0, medbay: 0, ...modules },
-    log: [`🚀 Mission started at ${loc.name}. Crew of ${4} cadets. Good luck, commander!`],
+    log: [`Mission started at ${loc.name}. Crew of 4.`],
     pendingEvent: null,
     pendingQuiz: null,
     status: 'running', // running | gameover | victory

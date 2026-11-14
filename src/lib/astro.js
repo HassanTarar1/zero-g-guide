@@ -89,20 +89,52 @@ export async function fetchISS(signal) {
   return r.json() // { latitude, longitude, altitude(km), velocity(km/h), visibility: 'day'|'night', timestamp }
 }
 
-/** NASA DONKI — solar flare events (last N days). */
-export async function fetchSolarFlares(days = 30, signal) {
-  const start = new Date(Date.now() - days * DAY_MS).toISOString().slice(0, 10)
-  const r = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${start}&api_key=DEMO_KEY`, { signal })
-  if (!r.ok) throw new Error(`DONKI ${r.status}`)
-  return r.json() // [{ flrID, classType, peakTime, sourceLocation, activeRegionNum, ... }]
+/**
+ * NOAA SWPC GOES X-ray flux flares — keyless, updated every minute.
+ * Normalized to the DONKI flare shape used by the advisory engine.
+ */
+export async function fetchGoesFlares(signal) {
+  const r = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xray-flares-latest.json', { signal })
+  if (!r.ok) throw new Error(`GOES flares ${r.status}`)
+  const list = await r.json()
+  return list
+    .filter((f) => f.max_class)
+    .map((f) => ({
+      id: f.flare_id ?? f.max_time,
+      classType: f.max_class,
+      peakTime: f.max_time,
+      beginTime: f.begin_time,
+      activeRegionNum: null,
+      source: 'NOAA GOES X-ray',
+    }))
+    .sort((a, b) => new Date(b.peakTime) - new Date(a.peakTime))
 }
 
-/** NASA DONKI — solar energetic particle (SEP) events (last N days). */
-export async function fetchSEPEvents(days = 90, signal) {
-  const start = new Date(Date.now() - days * DAY_MS).toISOString().slice(0, 10)
-  const r = await fetch(`https://api.nasa.gov/DONKI/SEP?startDate=${start}&api_key=DEMO_KEY`, { signal })
-  if (!r.ok) throw new Error(`DONKI SEP ${r.status}`)
-  return r.json()
+/**
+ * NOAA SWPC GOES integral proton flux — keyless.
+ * ≥10 MeV protons above 10 pfu is the S1 solar-radiation-storm threshold.
+ */
+export async function fetchProtonFlux(signal) {
+  const r = await fetch('https://services.swpc.noaa.gov/json/goes/primary/integral-protons-1-day.json', { signal })
+  if (!r.ok) throw new Error(`GOES protons ${r.status}`)
+  const list = await r.json()
+  const latest = {}
+  for (const row of list) latest[row.energy] = row.flux
+  return {
+    p1: latest['>=1 MeV'] ?? 0,
+    p10: latest['>=10 MeV'] ?? 0,
+    p100: latest['>=100 MeV'] ?? 0,
+    updated: list[list.length - 1]?.time_tag ?? null,
+  }
+}
+
+/** NOAA SWPC planetary K index — keyless, latest 1-minute sample. */
+export async function fetchKpIndex(signal) {
+  const r = await fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json', { signal })
+  if (!r.ok) throw new Error(`NOAA Kp ${r.status}`)
+  const list = await r.json()
+  const last = list[list.length - 1]
+  return { kp: Number(last?.estimated_kp ?? last?.kp_index ?? 0), updated: last?.time_tag ?? null }
 }
 
 /** NOAA SWPC — official real-time space-weather alerts/warnings/watches (Space Agency Partner data). */

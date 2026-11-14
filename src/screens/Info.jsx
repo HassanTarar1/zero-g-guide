@@ -21,100 +21,138 @@ function NasaGallery() {
   }, [])
 
   return (
-    <div className="mt-6">
-      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Live NASA Image Library — fetched now, no key required</h3>
-      {err && <p className="mt-2 text-sm text-slate-400">(Library unreachable right now — the game still works offline.)</p>}
-      {!items && !err && <p className="mt-2 text-sm text-slate-400">Loading NASA images…</p>}
+    <section className="mt-6">
+      <h3 className="kicker">Live query · NASA Image and Video Library</h3>
+      {err && <p className="mt-2 text-[12px] text-slate-500">Library unreachable. The rest of the app is unaffected.</p>}
+      {!items && !err && <p className="mt-2 text-[12px] text-slate-500">Querying images-api.nasa.gov…</p>}
       {items && (
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {items.map((it, i) => (
-            <div key={i} className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-950/40">
+            <figure key={i} className="border border-slate-800">
               {it.thumb && <img src={it.thumb} alt={it.title || 'NASA image'} className="h-28 w-full object-cover" loading="lazy" />}
-              <p className="line-clamp-2 p-2 text-[11px] text-slate-400">{it.title}</p>
-            </div>
+              <figcaption className="line-clamp-2 px-2 py-1.5 text-[10.5px] leading-snug text-slate-500">{it.title}</figcaption>
+            </figure>
           ))}
         </div>
       )}
-    </div>
+    </section>
   )
 }
 
+const GROUPS = [
+  ['nasa', 'NASA data'],
+  ['partner', 'Partner data'],
+  ['other', 'Other data'],
+]
+
 export default function Info({ tab, setTab, onBack }) {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <button onClick={onBack} className="text-sm text-slate-400 hover:text-cyan-300">← Back</button>
-      <div className="mt-3 flex gap-2">
-        <button
-          onClick={() => setTab('data')}
-          className={`rounded-xl px-4 py-2 font-bold transition ${tab === 'data' ? 'bg-cyan-500 text-slate-950' : 'border border-slate-600 text-slate-300 hover:border-cyan-400'}`}
-        >
-          NASA data used
-        </button>
-        <button
-          onClick={() => setTab('about')}
-          className={`rounded-xl px-4 py-2 font-bold transition ${tab === 'about' ? 'bg-cyan-500 text-slate-950' : 'border border-slate-600 text-slate-300 hover:border-cyan-400'}`}
-        >
-          About Zero-G Guide
-        </button>
+    <div className="px-5 py-6">
+      <div className="max-w-4xl">
+        <p className="kicker">Reference</p>
+        <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3 border-b border-slate-700 pb-3">
+          <h1 className="text-[17px] font-semibold text-slate-100">Data, method and disclosure</h1>
+          <button onClick={onBack} className="text-[11px] text-slate-500 hover:text-slate-300">← Back</button>
+        </div>
+
+        <div className="mt-3 flex gap-0 border-b border-slate-800">
+          {[['data', 'Sources'], ['about', 'Method']].map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className={`-mb-px border-b-2 px-3 py-2 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
+                tab === id ? 'border-cyan-400 text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'data' && (
+          <div className="mt-5">
+            <p className="max-w-[82ch] text-[13px] leading-relaxed text-slate-400">
+              Values in this application come from two places: live fetches from the endpoints below, and arithmetic
+              on published measurements. No number in the scenario model is invented. Where a feed is unavailable the
+              interface reports it instead of substituting a value.
+            </p>
+
+            {GROUPS.map(([kind, title]) => {
+              const list = SOURCES.filter((s) => s.kind === kind)
+              if (!list.length) return null
+              return (
+                <section key={kind} className="mt-5">
+                  <h2 className="kicker">{title}</h2>
+                  <table className="mt-1.5 w-full border-collapse text-[11.5px]">
+                    <tbody>
+                      {list.map((s) => (
+                        <tr key={s.name} className="border-b border-slate-800 align-top">
+                          <td className="w-[46%] py-1.5 pr-4">
+                            <a
+                              href={s.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-slate-300 underline decoration-slate-700 underline-offset-2 hover:text-cyan-300"
+                            >
+                              {s.name}
+                            </a>
+                          </td>
+                          <td className="py-1.5 text-slate-500">{s.used}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+              )
+            })}
+
+            <NasaGallery />
+          </div>
+        )}
+
+        {tab === 'about' && (
+          <div className="mt-5 space-y-6">
+            <section>
+              <h2 className="kicker">What this is</h2>
+              <p className="mt-2 max-w-[82ch] text-[13px] leading-relaxed text-slate-400">
+                Zero-G Guide is a browser-based decision aid for crews operating where Earth cannot answer in time.
+                It reduces live space-weather measurements, crew dose state and computed light-time into a prioritized
+                advisory log. Each advisory carries its source, its evidence and the actions to take. The same
+                constraints drive a training scenario in which the crew resolves events without a real-time link.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="kicker">Method</h2>
+              <ul className="mt-2 max-w-[82ch] list-disc space-y-1 pl-5 text-[12.5px] leading-relaxed text-slate-400">
+                <li>Earth–Mars and Earth–Moon light-time is computed from low-precision orbital elements (Schlyter), accurate to roughly 1% over 2000–2100, and divided by the speed of light.</li>
+                <li>Proton flux above 10 pfu at ≥10 MeV is treated as the S1 threshold. Flare class, Kp and SWPC alerts are read live and never cached longer than five minutes.</li>
+                <li>Consumables use ISS per-crew rates: 0.84 kg O₂, 3.5 L water and 1.83 kg food per crew-day.</li>
+                <li>Radiation uses Curiosity RAD at Mars (0.7 mSv/sol) and LRO CRaTER at the Moon (1.4 mSv/sol), against an approximate 600 mSv career limit.</li>
+                <li>Shielding transmission values are illustrative ranges from published NASA shielding studies, not a transport calculation.</li>
+                <li>Scenario events follow documented hazards: dust storms, solar particle events, micrometeoroid strikes and moonquakes recorded by Apollo seismometers.</li>
+              </ul>
+            </section>
+
+            <section className="border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+              <h2 className="kicker text-amber-300">Super Intelligence disclosure</h2>
+              <p className="mt-1.5 max-w-[82ch] text-[12.5px] leading-relaxed text-slate-400">
+                This project was developed with assistance from large language model tools, as permitted by the
+                challenge rules. All logic, interface and text were directed, reviewed and tested by the human team.
+                No AI-generated imagery, audio or video is used. NASA imagery is fetched at runtime from NASA's public
+                APIs. No NASA logos, flags or mission identifiers are used.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="kicker">Team</h2>
+              <p className="mt-2 text-[12.5px] text-slate-400">
+                Team Zero-G Guide · NASA Space Apps Challenge 2026 · Challenge: Build a Junior Astronaut Mission Trainer.
+              </p>
+            </section>
+          </div>
+        )}
       </div>
-
-      {tab === 'data' && (
-        <div className="mt-6">
-          <p className="text-slate-300">
-            Zero-G Guide is powered by <span className="font-bold text-white">real NASA data</span>. Every simulation
-            number below is sourced from a public NASA measurement or fact sheet — no made-up physics.
-          </p>
-          <div className="mt-4 space-y-3">
-            {SOURCES.map((s) => (
-              <a
-                key={s.url}
-                href={s.url}
-                target="_blank"
-                rel="noreferrer"
-                className="block rounded-xl border border-slate-700/60 bg-slate-900/60 p-4 transition hover:border-cyan-400/60"
-              >
-                <p className="font-bold text-cyan-300">{s.name}</p>
-                <p className="mt-1 text-sm text-slate-400">Used for: {s.used}</p>
-              </a>
-            ))}
-          </div>
-          <NasaGallery />
-        </div>
-      )}
-
-      {tab === 'about' && (
-        <div className="mt-6 space-y-4 text-slate-300">
-          <div className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-5">
-            <h3 className="font-bold text-white">Team Zero-G Guide</h3>
-            <p className="mt-1 text-sm">NASA Space Apps Challenge 2026 · Challenge: <em>Build a Junior Astronaut Mission Trainer</em></p>
-            <p className="mt-3 text-sm">
-              Zero-G Guide turns the real engineering trade-offs of a lunar or Martian outpost into a game a 10-year-old
-              can play in five minutes. Cadets manage the same four budgets real mission planners juggle — life support,
-              power, radiation and food — using numbers measured by actual NASA instruments (Curiosity’s RAD, LRO’s
-              CRaTER, InSight’s weather sensors, the ISS water recycler).
-            </p>
-          </div>
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
-            <h3 className="font-bold text-amber-300">Super Intelligence (SI) disclosure</h3>
-            <p className="mt-2 text-sm">
-              This project’s code was developed <span className="font-semibold">with the assistance of AI (large language model) tools</span> as
-              permitted by the Space Apps Challenge rules. All simulation logic, UI and text were generated and then
-              reviewed, tested and directed by the human team. No AI-generated images, audio or video are used; no NASA
-              logos, flags or mission identifiers appear anywhere in this project. NASA imagery shown in the “Live NASA
-              Image Library” section is fetched directly from NASA’s official public API at runtime and is not AI-generated.
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-5">
-            <h3 className="font-bold text-white">Design notes</h3>
-            <ul className="mt-2 list-disc space-y-1 text-sm">
-              <li>Consumables use ISS per-crew rates: 0.84 kg O₂/day, 3.5 L water/day, 1.83 kg food/day.</li>
-              <li>Radiation uses Curiosity RAD (Mars ≈ 0.7 mSv/day) and LRO CRaTER (Moon ≈ 1.4 mSv/day) measurements, with NASA’s ~600 mSv career limit as a hard game-over.</li>
-              <li>Solar output scales with each world’s real sunlight: Mars receives ≈ 43% of Earth’s insolation; the Moon has 14-day nights.</li>
-              <li>Events are based on real hazards: Mars dust storms (RIP Opportunity), solar particle events, micrometeoroid strikes, moonquakes recorded by Apollo seismometers.</li>
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

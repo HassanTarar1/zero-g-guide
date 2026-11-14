@@ -17,84 +17,110 @@ export default function Setup({ onBack, onLaunch }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <button onClick={onBack} className="text-sm text-slate-400 hover:text-cyan-300">← Back</button>
-      <h1 className="mt-2 text-xl font-bold tracking-tight text-white">Mission Setup</h1>
-      <p className="text-slate-400">Choose your outpost, then spend {CONSUMPTION.setupCredits} starting credits on hardware.</p>
-
-      {/* Location picker */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {Object.values(LOCATIONS).map((l) => (
-          <button
-            key={l.key}
-            onClick={() => setLocationKey(l.key)}
-            className={`rounded-2xl border p-5 text-left transition ${
-              locationKey === l.key ? 'border-cyan-400 bg-cyan-500/10 ring-2 ring-cyan-400/40' : 'border-slate-700 bg-slate-900/60 hover:border-slate-500'
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded border border-slate-700 bg-slate-950/60 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {l.key}
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-white">{l.name}</h3>
-                <p className="mt-1 text-sm text-slate-300">{l.blurb}</p>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">☀️ sunlight ×{l.solarFactor}</span>
-              <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">☢️ {l.radiationMSvPerDay} mSv/day</span>
-              <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">🌡️ avg {l.avgTempC}°C</span>
-              <span className="rounded-full bg-slate-800 px-2 py-1 text-slate-300">🎯 survive {l.missionSols} sols</span>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Module shop */}
-      <h2 className="mt-8 text-base font-bold text-white">Base configuration</h2>
-      <p className="mt-1 text-sm text-amber-300">
-        Recommended starting loadout: 2× Solar Array + 1× Water Recycler (95 cr) — add an RTG or O₂ Generator once you earn credits.
-      </p>
-      <div className="mt-3 grid gap-3 md:grid-cols-2">
-        {Object.values(MODULES).map((m) => (
-          <div key={m.id} className="flex items-start gap-3 rounded-xl border border-slate-700/60 bg-slate-900/60 p-4">
-            <div className="text-3xl">{m.icon}</div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-white">{m.name}</h4>
-                <span className="rounded bg-amber-500/15 px-2 py-0.5 text-xs font-bold text-amber-300">{m.cost} cr</span>
-              </div>
-              <p className="mt-1 text-xs text-slate-400">{m.desc}</p>
-              <div className="mt-2 flex items-center gap-2">
-                <button onClick={() => change(m.id, -1)} disabled={modules[m.id] === 0}
-                  className="h-8 w-8 rounded-lg bg-slate-800 font-bold text-white disabled:opacity-30">−</button>
-                <span className="w-8 text-center font-bold text-white">{modules[m.id]}</span>
-                <button onClick={() => change(m.id, 1)} disabled={modules[m.id] >= m.max || m.cost > creditsLeft}
-                  className="h-8 w-8 rounded-lg bg-cyan-600 font-bold text-white disabled:opacity-30">+</button>
-                <span className="text-xs text-slate-500">max {m.max}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Launch bar */}
-      <div className="sticky bottom-4 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-xl backdrop-blur">
-        <div>
-          <p className="text-sm text-slate-400">Destination: <span className="font-bold text-white">{loc.flag} {loc.name}</span></p>
-          <p className="text-sm text-slate-400">
-            Credits left: <span className={creditsLeft < 0 ? 'font-bold text-rose-400' : 'font-bold text-lime-400'}>{creditsLeft}</span>
-            {creditsLeft < 0 && ' — overspent! Remove a module.'}
+    <div className="px-5 py-5">
+      <div className="max-w-4xl pb-24">
+        <button onClick={onBack} className="text-[11px] text-slate-500 hover:text-slate-300">← Back</button>
+        <p className="kicker mt-3">Simulation / Configuration</p>
+        <div className="mt-1 border-b border-slate-700 pb-3">
+          <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">Mission setup</h1>
+          <p className="mt-1 max-w-[80ch] text-[12.5px] leading-relaxed text-slate-500">
+            Select a station, then allocate {CONSUMPTION.setupCredits} credits of hardware. Consumption rates and
+            radiation values are fixed by the selected environment.
           </p>
         </div>
-        <button
-          onClick={() => onLaunch(locationKey, modules, creditsLeft)}
-          disabled={creditsLeft < 0}
-          className="rounded bg-cyan-500 px-8 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-400 disabled:opacity-40"
-        >
-          Launch mission
-        </button>
+
+        {/* Station */}
+        <h2 className="kicker mt-4">Station</h2>
+        <div className="mt-1.5 border-t border-slate-700">
+          {Object.values(LOCATIONS).map((l) => {
+            const on = locationKey === l.key
+            return (
+              <button
+                key={l.key}
+                onClick={() => setLocationKey(l.key)}
+                className={`block w-full border-b border-l-2 px-3 py-3 text-left transition ${
+                  on
+                    ? 'border-b-slate-800 border-l-cyan-400 bg-[#15161a]'
+                    : 'border-b-slate-800 border-l-transparent hover:bg-[#131417]'
+                }`}
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="text-[13px] font-semibold text-slate-100">{l.name}</h3>
+                  <span className="num text-[10px] text-slate-600">{l.missionSols} SOLS</span>
+                </div>
+                <p className="mt-1 max-w-[76ch] text-[12px] leading-relaxed text-slate-400">{l.blurb}</p>
+                <div className="num mt-1.5 flex flex-wrap gap-x-5 gap-y-0.5 text-[10.5px] text-slate-500">
+                  <span>SUN ×{l.solarFactor}</span>
+                  <span>{l.radiationMSvPerDay} mSv/sol</span>
+                  <span>AVG {l.avgTempC} °C</span>
+                  <span>ENDURANCE {l.missionSols} sols</span>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Hardware */}
+        <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="kicker">Hardware</h2>
+          <span className="num text-[10px] text-slate-500">
+            CREDITS {creditsLeft} / {CONSUMPTION.setupCredits}
+          </span>
+        </div>
+        <p className="mt-1 text-[11.5px] text-slate-500">
+          Starting loadout in use: 2 solar arrays + 1 water recycler. An RTG covers the lunar night.
+        </p>
+
+        <div className="mt-1.5 border-t border-slate-700">
+          {Object.values(MODULES).map((m) => (
+            <div key={m.id} className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-slate-800 py-2.5">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                  <h3 className="text-[12.5px] font-medium text-slate-100">{m.name}</h3>
+                  <span className="num text-[10px] text-amber-400">{m.cost} cr</span>
+                  <span className="num text-[10px] text-slate-600">max {m.max}</span>
+                </div>
+                <p className="mt-0.5 max-w-[70ch] text-[11.5px] leading-snug text-slate-500">{m.desc}</p>
+              </div>
+              <div className="flex items-center gap-0">
+                <button
+                  onClick={() => change(m.id, -1)}
+                  disabled={modules[m.id] === 0}
+                  className="h-7 w-7 border border-slate-700 text-[13px] text-slate-300 transition hover:border-slate-500 disabled:opacity-25"
+                >
+                  −
+                </button>
+                <span className="num w-9 text-center text-[12px] text-slate-100">{modules[m.id]}</span>
+                <button
+                  onClick={() => change(m.id, 1)}
+                  disabled={modules[m.id] >= m.max || m.cost > creditsLeft}
+                  className="h-7 w-7 border border-slate-700 text-[13px] text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300 disabled:opacity-25"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Launch bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-700 bg-[#0d0e10]/95 px-5 py-3 backdrop-blur md:left-52">
+          <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
+            <div className="num text-[10.5px] text-slate-500">
+              <span className="text-slate-300">{loc.name}</span>
+              <span className="mx-2 text-slate-700">|</span>
+              CREDITS <span className={creditsLeft < 0 ? 'text-rose-400' : 'text-lime-400'}>{creditsLeft}</span>
+              {creditsLeft < 0 && <span className="ml-2 text-rose-400">OVERSPENT</span>}
+            </div>
+            <button
+              onClick={() => onLaunch(locationKey, modules, creditsLeft)}
+              disabled={creditsLeft < 0}
+              className="bg-cyan-500 px-5 py-2 text-[12px] font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:opacity-40"
+            >
+              Launch mission
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

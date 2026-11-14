@@ -101,7 +101,7 @@ export const PROTOCOLS = [
     severity: 'MODERATE',
     tag: 'Operations',
     steps: [
-      'Compute current one-way light delay (Dashboard module) — it defines your autonomy window.',
+      'Compute current one-way light delay (Console module) — it defines your autonomy window.',
       'Pre-plan decisions: under delay, act first on life-support emergencies, report afterward.',
       'Batch non-urgent questions into the next comm window; draft reports while waiting.',
       'If using relay (TDRS/DSN windows are periodic): schedule critical tasks inside predicted windows.',

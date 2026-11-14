@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { PROTOCOLS, SEVERITY_STYLES } from '../data/protocols'
+import { PROTOCOLS } from '../data/protocols'
+
+const SEV = {
+  CRITICAL: 'text-rose-400',
+  HIGH: 'text-orange-400',
+  MODERATE: 'text-amber-400',
+}
 
 export default function Advisor() {
   const [query, setQuery] = useState('')
@@ -15,60 +21,69 @@ export default function Advisor() {
   )
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6">
-      <h2 className="text-xl font-bold tracking-tight text-white">Protocol Advisor</h2>
-      <p className="text-sm text-slate-400">
-        Emergency & operations checklists for the moment when Earth can't answer. Built from publicly documented
-        NASA/ISS procedures — a training aid, not official flight rules.
-      </p>
+    <div className="px-5 py-5">
+      <div className="max-w-4xl">
+        <p className="kicker">Procedures / Autonomous operations</p>
+        <div className="mt-1 border-b border-slate-700 pb-3">
+          <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">Emergency checklists</h1>
+          <p className="mt-1 max-w-[80ch] text-[12.5px] leading-relaxed text-slate-500">
+            Eight procedures for the interval when Earth cannot answer. Compiled from publicly documented NASA and ISS
+            practice. A training aid, not a flight rule.
+          </p>
+        </div>
 
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search: fire, leak, CO₂, radiation, power, medical, delay, dust…"
-        className="mt-4 w-full rounded-xl border border-slate-600 bg-slate-950/70 px-4 py-3 text-white outline-none backdrop-blur focus:border-cyan-400"
-      />
+        <div className="mt-3 flex items-center gap-3">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Filter: fire, leak, CO₂, radiation, power, medical, delay, dust"
+            className="w-full border border-slate-700 bg-slate-950 px-3 py-2 text-[12px] text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-400"
+          />
+          <span className="num shrink-0 text-[10px] text-slate-600">{list.length} / {PROTOCOLS.length}</span>
+        </div>
 
-      <div className="mt-4 space-y-3">
-        {list.map((p) => {
-          const open = openId === p.id
-          return (
-            <div key={p.id} className="rounded-2xl border border-slate-700/60 bg-slate-900/70 backdrop-blur">
-              <button
-                onClick={() => setOpenId(open ? null : p.id)}
-                className="flex w-full items-center justify-between gap-3 p-4 text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-full border px-2.5 py-1 text-[10px] font-black tracking-wider ${SEVERITY_STYLES[p.severity]}`}>
+        <div className="mt-3 border-t border-slate-700">
+          {list.map((p) => {
+            const open = openId === p.id
+            return (
+              <div key={p.id} className="border-b border-slate-800">
+                <button
+                  onClick={() => setOpenId(open ? null : p.id)}
+                  className="grid w-full grid-cols-[74px_1fr_18px] items-baseline gap-3 py-2.5 text-left transition hover:bg-[#131417]"
+                >
+                  <span className={`num text-[9.5px] uppercase tracking-[0.1em] ${SEV[p.severity] ?? 'text-slate-500'}`}>
                     {p.severity}
                   </span>
-                  <div>
-                    <p className="font-bold text-white">{p.title}</p>
-                    <p className="text-[11px] text-slate-500">{p.tag} · {p.steps.length} steps</p>
+                  <span>
+                    <span className="block text-[13px] font-medium text-slate-100">{p.title}</span>
+                    <span className="mt-0.5 block text-[10.5px] text-slate-600">{p.tag} · {p.steps.length} steps</span>
+                  </span>
+                  <span className="num text-right text-[11px] text-slate-600">{open ? '−' : '+'}</span>
+                </button>
+
+                {open && (
+                  <div className="pb-4 pl-[86px] pr-1">
+                    <ol className="space-y-1.5">
+                      {p.steps.map((s, i) => (
+                        <li key={i} className="flex gap-3 text-[12.5px] leading-relaxed text-slate-300">
+                          <span className="num w-3 shrink-0 text-slate-600">{i + 1}.</span>
+                          <span>{s}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-3 border-l-2 border-slate-700 pl-3">
+                      <p className="text-[11.5px] leading-relaxed text-slate-400">
+                        <span className="text-slate-300">Why. </span>{p.why}
+                      </p>
+                      <p className="mt-1 kicker text-slate-600">Source · {p.source}</p>
+                    </div>
                   </div>
-                </div>
-                <span className="text-slate-400">{open ? '▾' : '▸'}</span>
-              </button>
-              {open && (
-                <div className="animate-slide-up border-t border-slate-700/60 p-4">
-                  <ol className="space-y-2">
-                    {p.steps.map((s, i) => (
-                      <li key={i} className="flex gap-3 text-sm text-slate-300">
-                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-cyan-500/15 text-xs font-black text-cyan-300">{i + 1}</span>
-                        <span className="leading-relaxed">{s}</span>
-                      </li>
-                    ))}
-                  </ol>
-                  <div className="mt-4 rounded-xl bg-slate-950/50 p-3">
-                    <p className="text-xs text-slate-400"><span className="font-bold text-amber-300">Why: </span>{p.why}</p>
-                    <p className="mt-1 text-[11px] text-slate-500">Source: {p.source}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        })}
-        {list.length === 0 && <p className="text-sm text-slate-400">No protocol matches "{query}".</p>}
+                )}
+              </div>
+            )
+          })}
+          {list.length === 0 && <p className="py-4 text-[12px] text-slate-500">No procedure matches "{query}".</p>}
+        </div>
       </div>
     </div>
   )

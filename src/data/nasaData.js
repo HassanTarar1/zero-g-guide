@@ -10,7 +10,7 @@ export const LOCATIONS = {
     name: 'Mars Base Ares',
     flag: '🔴',
     blurb:
-      'A long-duration outpost on Mars. Days (sols) last 24h 39m, sunlight is weak, dust storms can darken your solar panels, and radiation is a constant companion.',
+      'Long-duration surface outpost. A sol is 24 h 39 m. Surface sunlight is about 43% of Earth’s, and dust events cut array output. Radiation exposure is continuous.',
     missionSols: 100,
     solLabel: 'Sol',
     // RAD instrument on NASA's Curiosity rover measured an average surface dose-rate of ~0.7 mSv/day on Mars.
@@ -27,7 +27,7 @@ export const LOCATIONS = {
     name: 'Moon Base Tranquility',
     flag: '🌕',
     blurb:
-      'An outpost on the Moon. A lunar day/night cycle lasts ~28 Earth days (14 days of light, 14 of darkness). No atmosphere means solar flares hit fast and hard, and the lunar night is brutally cold.',
+      'Surface outpost at Tranquility. The lunar day/night cycle runs about 28 Earth days, with roughly 14 days of darkness. No atmosphere attenuates solar particles.',
     missionSols: 84, // 3 full lunar day/night cycles
     solLabel: 'Day',
     // Data from NASA's Lunar Reconnaissance Orbiter (CRaTER) indicate a lunar surface dose-rate
@@ -438,46 +438,90 @@ export const TIPS = [
   '💡 NASA is developing nuclear fission power for Artemis Moon bases — solar alone can’t survive the 14-day night.',
 ]
 
-/** Public NASA data sources used. Shown in the app and submitted with the project. */
+/** Public data sources used. Shown in the app and submitted with the project. */
 export const SOURCES = [
   {
-    name: 'RAD Instrument, NASA Curiosity Rover — Mars surface radiation (~0.7 mSv/day)',
+    kind: 'nasa',
+    name: 'RAD instrument, Curiosity rover — Mars surface radiation (~0.7 mSv/sol)',
     url: 'https://science.nasa.gov/mission/mars-science-laboratory-curiosity/',
-    used: 'Mars daily radiation dose in the simulation and Solar Flare event math',
+    used: 'Mars dose rate, SEP event math, advisory thresholds',
   },
   {
-    name: 'NASA Lunar Reconnaissance Orbiter (CRaTER) — lunar radiation environment',
+    kind: 'nasa',
+    name: 'Lunar Reconnaissance Orbiter (CRaTER) — lunar radiation environment',
     url: 'https://science.nasa.gov/mission/lunar-reconnaissance-orbiter/',
-    used: 'Moon daily radiation dose (~1.4 mSv/day) and flare penalties',
+    used: 'Moon dose rate (~1.4 mSv/sol)',
   },
   {
-    name: 'NASA NSSDC Mars Fact Sheet (solar irradiance, temperature, sol length)',
-    url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html',
-    used: 'Mars solar strength (≈43% of Earth), average temp (−63 °C), sol length (24h 39m)',
+    kind: 'nasa',
+    name: 'NASA-STD-3001 — crew health and medical standards',
+    url: 'https://standards.nasa.gov/standard/NASA/NASA-STD-3001',
+    used: 'Career dose limit basis (~600 mSv)',
   },
   {
-    name: 'NASA NSSDC Moon Fact Sheet (day/night cycle, temperature extremes)',
-    url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html',
-    used: '28-day lunar cycle, −173 °C to +127 °C temperature swing',
+    kind: 'nasa',
+    name: 'NASA EPIC / DSCOVR — full-disc Earth imagery',
+    url: 'https://epic.gsfc.nasa.gov/',
+    used: 'Live Earth downlink frame and timestamp on the console',
   },
   {
-    name: 'NASA InSight Lander — Mars weather measurements',
-    url: 'https://science.nasa.gov/mission/insight/',
-    used: 'Mars surface temperature range shown in base briefings',
+    kind: 'nasa',
+    name: 'NASA/JPL Mars rover photos API — Curiosity latest frames',
+    url: 'https://api.nasa.gov/',
+    used: 'Live Martian surface image, sol and camera on the console',
   },
   {
-    name: 'NASA ISS Environmental Control & Life Support System (water recycling, consumption rates)',
-    url: 'https://www.nasa.gov/international-space-station/',
-    used: 'Per-crew O₂ (0.84 kg/day), water (3.5 L/day), food (1.83 kg/day) and 93% water recovery',
-  },
-  {
-    name: 'NASA Astronomy Picture of the Day (APOD) API — live "Cadet Briefing"',
-    url: 'https://api.nasa.gov',
-    used: 'Live astronomy image + explanation on the home screen',
-  },
-  {
-    name: 'NASA Image and Video Library API (images-api.nasa.gov)',
+    kind: 'nasa',
+    name: 'NASA Image and Video Library (images-api.nasa.gov)',
     url: 'https://images.nasa.gov',
-    used: 'Live NASA imagery gallery in the Data Sources screen',
+    used: 'Live imagery search on the data screen',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA NSSDC Mars Fact Sheet',
+    url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html',
+    used: 'Solar irradiance (43% of Earth), mean temperature, sol length',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA NSSDC Moon Fact Sheet',
+    url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html',
+    used: '28-day cycle, surface temperature range',
+  },
+  {
+    kind: 'nasa',
+    name: 'NASA InSight lander — Mars weather measurements',
+    url: 'https://science.nasa.gov/mission/insight/',
+    used: 'Surface temperature range in scenario briefings',
+  },
+  {
+    kind: 'nasa',
+    name: 'ISS Environmental Control and Life Support System',
+    url: 'https://www.nasa.gov/international-space-station/',
+    used: 'Consumables: 0.84 kg O₂, 3.5 L water, 1.83 kg food per crew-day',
+  },
+  {
+    kind: 'partner',
+    name: 'NOAA SWPC — alerts, watches and warnings',
+    url: 'https://services.swpc.noaa.gov/products/alerts.json',
+    used: 'Solar radiation and geomagnetic advisories',
+  },
+  {
+    kind: 'partner',
+    name: 'NOAA SWPC — GOES X-ray flares and integral proton flux',
+    url: 'https://services.swpc.noaa.gov/json/goes/primary/',
+    used: 'Live flare class, ≥10 MeV and ≥100 MeV proton flux',
+  },
+  {
+    kind: 'partner',
+    name: 'NOAA SWPC — planetary K index',
+    url: 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
+    used: 'Geomagnetic storm advisory, one-minute cadence',
+  },
+  {
+    kind: 'other',
+    name: 'wheretheiss.at — ISS orbital position',
+    url: 'https://wheretheiss.at/',
+    used: 'Latitude, longitude and sunlit/eclipse state, 15 s refresh',
   },
 ]

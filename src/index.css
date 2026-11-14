@@ -1,44 +1,142 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  /* Hard edges everywhere — no pill/card radius */
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+
+  /* Warm graphite — deliberately not the navy/cyan default */
+  --color-slate-950: #0b0c0d;
+  --color-slate-900: #101113;
+  --color-slate-800: #232528;
+  --color-slate-700: #34373b;
+  --color-slate-600: #4b4e53;
+  --color-slate-500: #7c7f85;
+  --color-slate-400: #a4a7ac;
+  --color-slate-300: #c8cacc;
+  --color-slate-200: #dfe0e0;
+  --color-slate-100: #eff0ee;
+  --color-slate-50: #f7f7f5;
+
+  /* Accent = bone, like a printed console key, not a brand colour */
+  --color-cyan-200: #f4f2ec;
+  --color-cyan-300: #e8e5dd;
+  --color-cyan-400: #dcd8cf;
+  --color-cyan-500: #c9c5bb;
+  --color-cyan-600: #a8a49a;
+
+  /* Status colours: muted, used only for state */
+  --color-rose-300: #dd9a94;
+  --color-rose-400: #cf5b52;
+  --color-rose-500: #b64a42;
+  --color-lime-300: #a9c9af;
+  --color-lime-400: #6fa07a;
+  --color-lime-500: #5b8666;
+  --color-amber-300: #e4bd7c;
+  --color-amber-400: #d08a3e;
+  --color-amber-500: #b5762f;
+  --color-orange-300: #e4bd7c;
+  --color-orange-400: #d08a3e;
+  --color-orange-500: #b5762f;
+  --color-sky-300: #a8c6dc;
+  --color-sky-500: #7ea6c9;
 }
 
 :root {
   color-scheme: dark;
 }
 
+html {
+  background: #0b0c0d;
+}
+
 body {
   margin: 0;
-  background-color: #0a0f1a;
-  color: #cbd5e1;
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
-  font-feature-settings: "cv11", "ss01";
+  background: #0b0c0d;
+  color: #d6d7d4;
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Subtle technical grid — no stars, no glows */
-.tech-grid {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
-  background-size: 48px 48px;
+::selection {
+  background: #dcd8cf;
+  color: #0b0c0d;
 }
 
+:focus-visible {
+  outline: 1px solid #dcd8cf;
+  outline-offset: 1px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0c0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c2f33;
+  border: 2px solid #0b0c0d;
+}
+
+/* Data type */
 .num {
-  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
-@keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.45); }
-  50% { box-shadow: 0 0 12px 2px rgba(244, 63, 94, 0.45); }
+.kicker {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c7f85;
 }
-.alert-pulse { animation: pulse-red 1.8s ease-in-out infinite; }
 
-@keyframes slide-up {
-  from { transform: translateY(16px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* Panel = ruled block, not a floating card */
+.panel {
+  background: #111214;
+  border: 1px solid #232528;
 }
-.animate-slide-up { animation: slide-up 0.25s ease-out; }
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #232528;
+  padding: 6px 12px;
+}
+
+/* The old arbitrary panel colour */
+.bg-\[\#0c1220\] {
+  background-color: #111214 !important;
+}
+
+/* Kill remaining circles and the old star grid */
+.rounded-full {
+  border-radius: 0 !important;
+}
+.tech-grid {
+  background-image: none !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

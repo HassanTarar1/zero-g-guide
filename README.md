@@ -1,66 +1,59 @@
-# Zero-G Guide — Junior Astronaut Mission Trainer
+# Zero-G Guide — onboard mission support
 
 **Team Zero-G Guide · NASA Space Apps Challenge 2026**
 Challenge: [Build a Junior Astronaut Mission Trainer](https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/)
 
-A browser game where junior astronauts run a **lunar or Martian outpost** and learn to balance the
-four budgets real mission planners juggle: **life support, power, radiation shielding, and food** —
-all using **real, citable NASA data**.
+A browser-based decision aid for crews operating beyond real-time Earth contact. It converts live
+space-weather measurements, crew dose state and computed light-time into a prioritized advisory log —
+each entry with its evidence, its source and the actions to take.
 
-## What it does
+## Modules
 
-- Cadets choose **Moon Base Tranquility** or **Mars Base Ares**, then build their base with mission
-  credits: solar arrays, RTG nuclear generators, batteries, water recyclers, greenhouses, radiation
-  shelters, and a med bay.
-- Each sol, the crew consumes real ISS life-support rates (**0.84 kg O₂, 3.5 L water, 1.83 kg food
-  per person per day**) while solar output scales with each world's real sunlight (Mars ≈ 43% of
-  Earth's; the Moon has 14-day nights).
-- Radiation accumulates from real dose measurements — **Curiosity RAD (Mars ≈ 0.7 mSv/day)** and
-  **LRO CRaTER (Moon ≈ 1.4 mSv/day)** — and the mission ends if the crew passes NASA's ~600 mSv
-  career limit.
-- Random events based on real hazards (dust storms, solar particle events, micrometeoroid strikes,
-  moonquakes) force trade-off decisions.
-- **Mission Academy** quizzes teach real NASA science and reward correct answers.
-- Live NASA data is pulled at runtime: the **Astronomy Picture of the Day API** (home screen) and
-  the **NASA Image and Video Library API** (Data Sources screen).
+**01 · Console.** NOAA GOES X-ray flare class, ≥10 MeV and ≥100 MeV proton flux, planetary K index and
+SWPC alerts are read live. Advisories are ranked critical → info and acknowledged into a watch log.
+One-way light time to Mars and the Moon is computed from orbital elements at light speed. Earth (EPIC)
+and Mars (Curiosity) downlink frames are shown with their timestamps.
+
+**02 · Radiation.** Career dose ledger against the ~600 mSv limit, using measured environments: Mars
+0.7 mSv/sol (Curiosity RAD), Moon 1.4 mSv/sol (LRO CRaTER), ISS 0.5 mSv/sol. Shielding transmission is
+applied per source, and a 14-sol rotation planner flags EVA conflicts on storm-watch sols.
+
+**03 · Procedures.** Eight checklists for the interval when Earth cannot answer: fire, depressurization,
+CO₂ rise, solar particle event, power failure, medical emergency, comm blackout, dust storm.
+
+**04 · Simulation.** A resource and radiation exercise under comm delay. Consumables follow ISS per-crew
+rates, solar output scales with each world's measured insolation, and hazards interrupt the plan with no
+real-time link.
+
+## Data
+
+Live NASA data: [EPIC/DSCOVR](https://epic.gsfc.nasa.gov/), [JPL rover photos](https://api.nasa.gov/),
+[NASA Image and Video Library](https://images.nasa.gov/). Partner data: [NOAA SWPC](https://www.swpc.noaa.gov/),
+[wheretheiss.at](https://wheretheiss.at/). Physical constants and dose rates from NASA fact sheets, RAD,
+CRaTER, ISS ECLSS and NASA-STD-3001. The full list is on the app's **Data & method** screen.
+
+Primary space-weather feeds need no API key. Failed sources are shown as unavailable rather than
+substituted.
 
 ## Running it
 
 ```bash
-npm install
-npm run dev      # development
-npm run build    # production build in dist/
-npm run preview  # serve the production build locally
+npm install --ignore-scripts   # esbuild postinstall can fail under antivirus
+npm run dev                    # development
+npm run build                  # production build in dist/
+npm run preview                # serve the production build
 ```
 
-## Deploying (public link for submission)
+## Deploying
 
-1. **GitHub Pages:** push this repo to GitHub, then enable Pages (Settings → Pages → Deploy from
-   branch `main`, folder `/dist` — or use the Actions workflow). The Vite `base: './'` config means
-   it works from any subfolder.
-2. **Netlify Drop:** drag the `dist/` folder to https://app.netlify.com/drop for an instant public URL.
+1. **GitHub Pages:** push to `main`, then Settings → Pages → Source: **GitHub Actions**. The included
+   workflow builds and publishes. `base: './'` keeps the build portable to a project subpath.
+2. **Netlify Drop:** drag `dist/` to https://app.netlify.com/drop for an instant URL.
 
-## Super Intelligence (SI) disclosure
+## Super Intelligence disclosure
 
-Per Space Apps rules: this project's **code was developed with the assistance of AI (large language
-model) tools**, directed, reviewed, and tested by the human team. **No AI-generated images, audio,
-or video** are used. **No NASA logos, flags, or mission identifiers** are used anywhere. NASA imagery
-shown via the live Image Library is fetched from NASA's official public API at runtime and is not
-AI-generated.
+Code and interface text were produced with large language model assistance under team direction, then
+reviewed, tested and revised by humans. No AI-generated images, audio or video are used. NASA imagery is
+fetched from NASA's public APIs at runtime. No NASA logos, flags or mission identifiers are used.
 
-## NASA data sources
-
-Full list with links is in the app (📡 NASA Data Used) and in `src/data/nasaData.js`:
-
-| Source | Used for |
-|---|---|
-| RAD instrument, Curiosity rover | Mars surface radiation (~0.7 mSv/day) |
-| Lunar Reconnaissance Orbiter (CRaTER) | lunar radiation environment (~1.4 mSv/day) |
-| NSSDC Mars Fact Sheet | solar irradiance, −63 °C average temp, 24h 39m sol |
-| NSSDC Moon Fact Sheet | 28-day day/night cycle, −173 °C to +127 °C |
-| InSight Lander | Mars weather measurements |
-| ISS ECLSS | per-crew consumption rates, 93% water recovery |
-| NASA APOD API (`api.nasa.gov`) | live "Cadet Briefing" |
-| NASA Image Library API (`images-api.nasa.gov`) | live image gallery |
-
-© Team Zero-G Guide, 2026. Built for the NASA Space Apps Challenge.
+© Team Zero-G Guide, 2026.
