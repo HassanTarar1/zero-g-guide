@@ -1,50 +1,65 @@
-import { useEffect, useState } from 'react'
 import { SOURCES } from '../data/nasaData'
 
-/**
- * Home screen with a LIVE NASA "Cadet Briefing" pulled from the
- * Astronomy Picture of the Day (APOD) API (api.nasa.gov, DEMO_KEY).
- */
-export default function Home({ onStart, onInfo, onAbout }) {
-  const [apod, setApod] = useState(null)
-  const [apodError, setApodError] = useState(false)
+const MODULES = [
+  {
+    icon: '📊',
+    title: 'Ops Dashboard',
+    text: 'Live ISS telemetry, real-time Earth–Moon–Mars light-delay calculator, and NASA DONKI space-weather advisories.',
+    tab: 'dashboard',
+    cta: 'Open dashboard',
+  },
+  {
+    icon: '☢️',
+    title: 'Radiation Manager',
+    text: 'Career-dose ledger against NASA’s ~600 mSv limit, with live solar-flare watch before EVA planning.',
+    tab: 'radiation',
+    cta: 'Open ledger',
+  },
+  {
+    icon: '📋',
+    title: 'Protocol Advisor',
+    text: 'Searchable emergency checklists — fire, cabin leak, CO₂, radiation storms — for the moment Earth can’t answer.',
+    tab: 'advisor',
+    cta: 'Browse protocols',
+  },
+  {
+    icon: '🎓',
+    title: 'Autonomy Trainer',
+    text: 'Scenario trainer where crews practice the same trade-offs with real NASA life-support and dose data.',
+    tab: 'trainer',
+    cta: 'Start training',
+  },
+]
 
-  useEffect(() => {
-    let cancelled = false
-    const ctrl = new AbortController()
-    const t = setTimeout(() => ctrl.abort(), 8000)
-    fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data) => { if (!cancelled) setApod(data) })
-      .catch(() => { if (!cancelled) setApodError(true) })
-      .finally(() => clearTimeout(t))
-    return () => { cancelled = true; ctrl.abort() }
-  }, [])
-
+export default function Home({ go, onInfo, onAbout }) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
+    <div className="mx-auto max-w-5xl px-4 pb-12 pt-10">
       {/* Hero */}
       <div className="text-center">
-        <div className="mb-4 text-7xl animate-float-rocket">🚀</div>
-        <h1 className="font-display text-4xl font-black tracking-widest sm:text-6xl">
+        <span className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 text-xs font-bold tracking-wide text-cyan-300">
+          NASA SPACE APPS CHALLENGE 2026 · JUNIOR ASTRONAUT MISSION TRAINER
+        </span>
+        <h1 className="font-display mt-5 text-4xl font-black tracking-widest sm:text-6xl">
           <span className="text-gradient">ZERO-G GUIDE</span>
         </h1>
-        <p className="mt-2 font-display text-lg font-bold tracking-wide text-amber-300">JUNIOR ASTRONAUT MISSION TRAINER</p>
-        <p className="mx-auto mt-4 max-w-2xl text-slate-300">
-          Cadet — your mission is to run a <span className="text-white font-semibold">real NASA-data-powered outpost</span> on
-          the Moon or Mars. Balance <span className="text-cyan-300">life support</span>, <span className="text-amber-300">power</span>,{' '}
-          <span className="text-rose-300">radiation shielding</span> and <span className="text-lime-300">food</span> through dust
-          storms, solar flares and 14-day lunar nights. Survive the full mission to graduate.
+        <p className="font-display mt-2 text-base font-bold tracking-wide text-slate-200 sm:text-xl">
+          The onboard assistant for astronauts when Earth can’t answer
+        </p>
+        <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-slate-400">
+          A one-way message to Mars takes up to <span className="font-bold text-white">22 minutes</span>. During a solar
+          radiation storm, that gap is dangerous. Zero-G Guide watches <span className="font-bold text-white">live NASA data</span> —
+          space weather, station telemetry, orbital mechanics — and gives crews the advisories, dose ledgers,
+          emergency protocols and autonomy training they need before, during and after the silence.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
-            onClick={onStart}
+            onClick={() => go('dashboard')}
             className="glow-cyan rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-display text-lg font-black tracking-wide text-slate-950 transition hover:scale-105"
           >
-            ▶ Start Mission Training
+            ▶ Open Live Dashboard
           </button>
-          <button onClick={onInfo} className="rounded-xl border border-slate-600 px-6 py-4 font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300">
-            📡 NASA Data Used
+          <button onClick={() => go('trainer')} className="rounded-xl border border-slate-600 px-6 py-4 font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300">
+            🎓 Autonomy Trainer
           </button>
           <button onClick={onAbout} className="rounded-xl border border-slate-600 px-6 py-4 font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300">
             ℹ️ About
@@ -52,60 +67,51 @@ export default function Home({ onStart, onInfo, onAbout }) {
         </div>
       </div>
 
-      {/* How it works */}
-      <div className="mt-12 grid gap-4 sm:grid-cols-3">
-        {[
-          { icon: '🛰️', title: '1. Build your base', text: 'Spend mission credits on solar arrays, RTG generators, greenhouses, water recyclers and radiation shelters.' },
-          { icon: '⏱️', title: '2. Fly sol by sol', text: 'Every sol your crew eats, drinks, breathes and absorbs radiation — using real NASA consumption and dose data.' },
-          { icon: '🧠', title: '3. Learn & decide', text: 'Random events force hard trade-offs, and Mission Academy quizzes teach real NASA science for bonus resources.' },
-        ].map((c) => (
-          <div key={c.title} className="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 backdrop-blur">
-            <div className="text-3xl">{c.icon}</div>
-            <h3 className="mt-2 font-bold text-white">{c.title}</h3>
-            <p className="mt-1 text-sm text-slate-300">{c.text}</p>
-          </div>
+      {/* Module grid */}
+      <div className="mt-12 grid gap-4 sm:grid-cols-2">
+        {MODULES.map((m) => (
+          <button
+            key={m.title}
+            onClick={() => go(m.tab)}
+            className="group rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-left backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-400/60"
+          >
+            <div className="text-3xl">{m.icon}</div>
+            <h3 className="font-display mt-2 font-bold tracking-wide text-white">{m.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">{m.text}</p>
+            <p className="mt-3 text-xs font-bold text-cyan-300 opacity-0 transition group-hover:opacity-100">{m.cta} →</p>
+          </button>
         ))}
       </div>
 
-      {/* Live NASA APOD */}
-      <div className="mt-12 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 backdrop-blur">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-white">🛰️ Cadet Briefing of the Day</h3>
-          <span className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
-            LIVE via NASA APOD API
-          </span>
-        </div>
-        {apodError && (
-          <p className="mt-3 text-sm text-slate-400">
-            (Couldn’t reach the NASA APOD API right now — rate limits or offline. The game itself doesn’t need it.)
-          </p>
-        )}
-        {!apod && !apodError && <p className="mt-3 text-sm text-slate-400">Contacting NASA…</p>}
-        {apod && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {apod.media_type === 'image' ? (
-              <img src={apod.url} alt={apod.title} className="h-48 w-full rounded-xl object-cover sm:h-full" loading="lazy" />
-            ) : (
-              <div className="grid h-full place-items-center rounded-xl bg-slate-800 p-4 text-5xl">🌌</div>
-            )}
-            <div>
-              <p className="font-bold text-amber-300">{apod.title}</p>
-              <p className="mt-1 text-xs text-slate-500">{apod.date}</p>
-              <p className="mt-2 line-clamp-6 text-sm text-slate-300">{apod.explanation}</p>
+      {/* The problem strip */}
+      <div className="mt-10 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-6 backdrop-blur">
+        <h3 className="font-display text-sm font-bold tracking-wide text-white">THE REAL PROBLEM WE SOLVE</h3>
+        <div className="mt-3 grid gap-4 sm:grid-cols-3">
+          {[
+            ['⏱️', 'Comm delay is physics', 'Light-speed makes real-time help impossible beyond LEO. Autonomy is not optional — it’s a trained skill.'],
+            ['☢️', 'Radiation is the career ceiling', 'NASA limits astronauts to ~600 mSv lifetime. Solar particle events can blow through monthly budgets in hours.'],
+            ['🏜️', 'Resources have weather', 'Solar power, water and food all interact with the environment — dust storms, eclipses, contamination.'],
+          ].map(([i, t, d]) => (
+            <div key={t}>
+              <div className="text-2xl">{i}</div>
+              <p className="mt-1 font-bold text-white">{t}</p>
+              <p className="mt-1 text-sm text-slate-400">{d}</p>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Credits */}
-      <footer className="mt-12 pb-8 text-center text-sm text-slate-500">
+      <footer className="mt-12 pb-4 text-center text-sm text-slate-500">
         <p>
           Built by <span className="font-semibold text-slate-300">Team Zero-G Guide</span> for the{' '}
           <a href="https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">
-            NASA Space Apps Challenge 2026 — Junior Astronaut Mission Trainer
+            NASA Space Apps Challenge 2026
           </a>
         </p>
-        <p className="mt-2">Uses {SOURCES.length} NASA data sources · No NASA logos or branding used</p>
+        <p className="mt-2">
+          Uses {SOURCES.length}+ NASA data sources · No NASA logos or branding used ·
+          <button onClick={onInfo} className="ml-1 text-cyan-400 hover:underline">see them all</button>
+        </p>
       </footer>
     </div>
   )

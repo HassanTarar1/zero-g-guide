@@ -10,19 +10,18 @@ Everything below is ready to paste into the Space Apps project submission form.
 
 ## Project Summary (≈170 words — limit 1500 chars)
 
-> Zero-G Guide is a Junior Astronaut Mission Trainer: a browser game where cadets run a lunar or
-> Martian outpost and learn the trade-offs real mission planners face every day. Players build a
-> base with solar arrays, RTG nuclear generators, batteries, water recyclers, greenhouses and
-> radiation shelters, then fly the mission sol by sol. Every tick uses real NASA data: ISS
-> life-support rates (0.84 kg oxygen, 3.5 L water and 1.83 kg food per person per day), Mars
-> radiation measured by Curiosity's RAD instrument (~0.7 mSv/day), lunar radiation from LRO's
-> CRaTER (~1.4 mSv/day), Mars receiving ~43% of Earth's sunlight, and the Moon's 14-day nights.
-> Dust storms, solar flares, micrometeoroid strikes and moonquakes force hard decisions, and
-> "Mission Academy" quizzes teach real NASA science for bonus resources. The mission ends if the
-> crew passes NASA's ~600 mSv career radiation limit — making shielding a real strategy, not
-> decoration. Zero-G Guide makes complex planetary-habitat engineering intuitive and fun for
-> students, and live NASA APIs (Astronomy Picture of the Day, Image Library) connect every session
-> to the real agency's science.
+> Zero-G Guide is the onboard assistant for astronauts when Earth can't answer. A one-way message to
+> Mars takes up to ~22 minutes — during a solar radiation storm, that silence is dangerous. Zero-G
+> Guide is a web application that watches live NASA data and gives crews (and future crews) four
+> tools: an Ops Dashboard with live ISS telemetry, a real-time Earth–Moon–Mars light-delay calculator
+> computed from orbital mechanics, and radiation advisories from NASA's DONKI space-weather database;
+> a Radiation Manager that tracks cumulative career dose against NASA's ~600 mSv limit using dose
+> rates measured by Curiosity's RAD instrument, LRO's CRaTER and ISS telemetry; a Protocol Advisor
+> with searchable emergency checklists (fire, cabin leak, CO₂, radiation storms) built from public
+> NASA/ISS operational knowledge; and a Comm-Delay Autonomy Trainer — a scenario simulator where
+> junior astronauts practice the same life-support, power, radiation and food trade-offs with real
+> NASA data. It addresses the challenge by training junior astronauts on the genuine constraints of
+> deep-space operations while providing a functional live assistant.
 
 ## Project Details (suggested text)
 
@@ -60,13 +59,14 @@ Everything below is ready to paste into the Space Apps project submission form.
 
 | Link Text | Link Url |
 |---|---|
-| RAD Instrument, Curiosity Rover — Mars surface radiation dose | https://science.nasa.gov/mission/mars-science-laboratory-curiosity/ |
-| Lunar Reconnaissance Orbiter (CRaTER) — lunar radiation environment | https://science.nasa.gov/mission/lunar-reconnaissance-orbiter/ |
+| NASA DONKI (Space Weather Database Of Notifications) — live solar flare & SEP advisories | https://api.nasa.gov |
+| RAD Instrument, Curiosity Rover — Mars surface radiation dose (~0.7 mSv/day) | https://science.nasa.gov/mission/mars-science-laboratory-curiosity/ |
+| Lunar Reconnaissance Orbiter (CRaTER) — lunar radiation environment (~1.4 mSv/day) | https://science.nasa.gov/mission/lunar-reconnaissance-orbiter/ |
 | NASA NSSDC Mars Fact Sheet — insolation, temperature, sol length | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html |
 | NASA NSSDC Moon Fact Sheet — lunar day/night cycle, temperature extremes | https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html |
-| NASA InSight Lander — Mars weather data | https://science.nasa.gov/mission/insight/ |
 | NASA ISS Environmental Control and Life Support System — consumption and recycling rates | https://www.nasa.gov/international-space-station/ |
-| NASA APOD API — live Cadet Briefing feature | https://api.nasa.gov |
+| NASA-STD-3001 — astronaut career radiation limit basis | https://www.nasa.gov/nasa-standards/ |
+| NASA Astronomy Picture of the Day (APOD) API — live Cadet Briefing feature | https://api.nasa.gov |
 | NASA Image and Video Library API — live gallery feature | https://images.nasa.gov |
 
 ## Super Intelligence (SI) disclosure
