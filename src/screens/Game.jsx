@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { LOCATIONS, MODULES, CONSUMPTION } from '../data/nasaData'
-import { tick, buildModule, resolveEvent, answerQuiz, batteryMax, isDaylight } from '../lib/simulation'
+import { useEffect, useRef, useState } from 'react'
+import { LOCATIONS, MODULES, CONSUMPTION, TIPS } from '../data/nasaData'
+import { tick, buildModule, resolveEvent, answerQuiz, orderResupply, crewParty, batteryMax, isDaylight } from '../lib/simulation'
 
 function Gauge({ icon, label, value, max, unit, danger }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100))
@@ -30,34 +30,76 @@ function Modal({ children }) {
 
 export default function Game({ sim, setSim, onQuit }) {
   const [showShop, setShowShop] = useState(true)
-  const loc = LOCATIONS[sim.locationKey]
-  const paused = sim.pendingEvent || sim.pendingQuiz
+  const [auto, setAuto] = useState(false)
+  const [tip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)])
+  const simRef = useRef(sim)
+  simRef.current = sim
 
-  const nextSol = () => {
-    if (paused) return
-    setSim(tick(sim))
-  }
+  const loc = LOCATIONS[sim.locationKey]
+  const paused = sim.pendingEvent || sim.pendingQuiz || sim.lastEventResult || sim.lastQuizResult
+
+  // Auto-fly: advance a sol every ~1.1s; stop when a decision is needed.
+  useEffect(() => {
+    if (!auto) return
+    const id = setInterval(() => {
+      const s = simRef.current
+      if (
+        s.status !== 'running' ||
+        s.pendingEvent || s.pendingQuiz || s.lastEventResult || s.lastQuizResult
+      ) {
+        setAuto(false)
+        return
+      }
+      setSim(tick(s))
+    }, 1100)
+    return () => clearInterval(id)
+  }, [auto, setSim])
+
+  const alerts = []
+  if (sim.lastTick?.outage) alerts.push('🔌 Power outage! Build 🔆 Solar, ☢️ RTG or 🔋 Battery banks.')
+  if (sim.o2 / CONSUMPTION.startO2 < 0.15) alerts.push('🫁 Oxygen critical — order a 📦 Resupply (25 cr) or build a ⚗️ O₂ Generator!')
+  if (sim.water / CONSUMPTION.startWater < 0.15) alerts.push('💧 Water critical — order a 📦 Resupply (25 cr) now!')
+  if (sim.food / CONSUMPTION.startFood < 0.15) alerts.push('🍲 Food critical — 📦 Resupply (25 cr) or add a 🌱 Greenhouse!')
+  if (sim.morale < 25) alerts.push('😤 Morale collapsing — throw a 🎉 Movie Night (10 cr)!')
+  if (sim.totalDose / CONSUMPTION.radiationCareerLimitMSv > 0.6) alerts.push('☢️ Radiation near NASA’s career limit — never work through solar flares, shelter!')
+
+  const solPct = Math.min(100, ((sim.sol - 1) / loc.missionSols) * 100)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 backdrop-blur">
-        <div>
-          <h1 className="text-xl font-black text-white">{loc.flag} {loc.name}</h1>
-          <p className="text-sm text-slate-400">
-            {loc.solLabel} <span className="font-bold text-cyan-300">{Math.min(sim.sol, loc.missionSols)}</span> / {loc.missionSols} ·
-            Crew: {sim.crew} · ☢️ lifetime dose {Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv
-            {sim.stormSols > 0 && <span className="ml-2 font-bold text-amber-300">🌪️ storm: {sim.stormSols} sols left</span>}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-amber-500/15 px-4 py-2 text-center">
-            <span className="text-xs font-semibold text-amber-200">CREDITS</span>
-            <span className="ml-2 text-lg font-black text-amber-300">{sim.credits}</span>
+      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-black text-white">{loc.flag} {loc.name}</h1>
+            <p className="text-sm text-slate-400">
+              {loc.solLabel} <span className="font-bold text-cyan-300">{Math.min(sim.sol, loc.missionSols)}</span> / {loc.missionSols} ·
+              Crew: {sim.crew} · ☢️ dose {Math.round(sim.totalDose)}/{CONSUMPTION.radiationCareerLimitMSv} mSv
+              {sim.stormSols > 0 && <span className="ml-2 font-bold text-amber-300">🌪️ storm: {sim.stormSols} sols left</span>}
+            </p>
           </div>
-          <button onClick={onQuit} className="text-sm text-slate-500 hover:text-rose-400">Abort ✕</button>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-amber-500/15 px-4 py-2 text-center">
+              <span className="text-xs font-semibold text-amber-200">CREDITS</span>
+              <span className="ml-2 text-lg font-black text-amber-300">{sim.credits}</span>
+            </div>
+            <button onClick={onQuit} className="text-sm text-slate-500 hover:text-rose-400">Abort ✕</button>
+          </div>
+        </div>
+        {/* Mission progress */}
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-lime-400 transition-all duration-700" style={{ width: `${solPct}%` }} />
         </div>
       </div>
+
+      {/* Critical alerts */}
+      {alerts.length > 0 && (
+        <div className="mt-3 rounded-xl border border-rose-500/50 bg-rose-500/10 p-3">
+          {alerts.map((a, i) => (
+            <p key={i} className="text-sm font-semibold text-rose-200">🚨 {a}</p>
+          ))}
+        </div>
+      )}
 
       {/* Gauges */}
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -83,13 +125,40 @@ export default function Game({ sim, setSim, onQuit }) {
 
         {/* Control panel */}
         <div className="lg:col-span-3 space-y-4">
-          <button
-            onClick={nextSol}
-            disabled={paused}
-            className="w-full rounded-2xl bg-cyan-500 py-5 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:scale-[1.02] hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
-          >
-            {paused ? '⏸️ Decision pending…' : '▶ Fly Next ' + loc.solLabel}
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setSim(tick(sim))}
+              disabled={paused}
+              className="col-span-2 rounded-2xl bg-cyan-500 py-4 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:scale-[1.02] hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+            >
+              {paused ? '⏸️ Decision pending…' : `▶ Fly Next ${loc.solLabel}`}
+            </button>
+            <button
+              onClick={() => setAuto(!auto)}
+              className={`rounded-xl px-4 py-3 font-bold transition ${
+                auto ? 'bg-lime-500 text-slate-950' : 'border border-lime-500/50 text-lime-300 hover:bg-lime-500/10'
+              }`}
+            >
+              {auto ? '⏸️ Stop auto-fly' : '⏩ Auto-fly'}
+            </button>
+            <button
+              onClick={() => setSim(orderResupply(sim))}
+              disabled={sim.credits < 25 || paused}
+              className="rounded-xl border border-amber-500/50 px-4 py-3 font-bold text-amber-300 transition hover:bg-amber-500/10 disabled:opacity-30"
+              title="+30 O₂, +50 water, +40 food"
+            >
+              📦 Resupply −25cr
+            </button>
+            <button
+              onClick={() => setSim(crewParty(sim))}
+              disabled={sim.credits < 10 || paused}
+              className="rounded-xl border border-pink-500/50 px-4 py-3 font-bold text-pink-300 transition hover:bg-pink-500/10 disabled:opacity-30"
+              title="+15 morale, −3 food"
+            >
+              🎉 Movie Night −10cr
+            </button>
+            <p className="col-span-2 px-1 text-xs text-slate-500">{tip}</p>
+          </div>
 
           {/* Shop */}
           <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 backdrop-blur">
@@ -134,7 +203,7 @@ export default function Game({ sim, setSim, onQuit }) {
             {sim.pendingEvent.choices.map((c, i) => (
               <button
                 key={i}
-                onClick={() => setSim(resolveEvent(sim, i))}
+                onClick={() => { setAuto(false); setSim(resolveEvent(sim, i)) }}
                 className="w-full rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 text-left font-semibold text-cyan-200 transition hover:bg-cyan-500/25"
               >
                 {c.label}
@@ -167,7 +236,7 @@ export default function Game({ sim, setSim, onQuit }) {
             {sim.pendingQuiz.options.map((o, i) => (
               <button
                 key={i}
-                onClick={() => setSim(answerQuiz(sim, i))}
+                onClick={() => { setAuto(false); setSim(answerQuiz(sim, i)) }}
                 className="w-full rounded-xl border border-slate-600 px-4 py-3 text-left font-semibold text-slate-200 transition hover:border-lime-400 hover:text-lime-300"
               >
                 {o}

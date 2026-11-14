@@ -3,7 +3,7 @@ import { LOCATIONS, MODULES, CONSUMPTION } from '../data/nasaData'
 
 export default function Setup({ onBack, onLaunch }) {
   const [locationKey, setLocationKey] = useState('mars')
-  const [modules, setModules] = useState({ solar: 1, rtg: 0, battery: 0, recycler: 0, greenhouse: 0, shelter: 0, medbay: 0 })
+  const [modules, setModules] = useState({ solar: 2, rtg: 0, battery: 0, recycler: 1, greenhouse: 0, shelter: 0, medbay: 0, oxygen: 0 })
   const spent = Object.entries(modules).reduce((a, [id, n]) => a + MODULES[id].cost * n, 0)
   const creditsLeft = CONSUMPTION.setupCredits - spent
   const loc = LOCATIONS[locationKey]
@@ -47,6 +47,9 @@ export default function Setup({ onBack, onLaunch }) {
 
       {/* Module shop */}
       <h2 className="mt-8 text-xl font-bold text-white">🔧 Build your starting base</h2>
+      <p className="mt-1 text-sm text-amber-300">
+        👶 Beginner tip: 2× Solar Array + 1× Water Recycler (95 cr) is a solid start — add a ☢️ RTG or ⚗️ O₂ Generator once you earn more credits.
+      </p>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         {Object.values(MODULES).map((m) => (
           <div key={m.id} className="flex items-start gap-3 rounded-xl border border-slate-700/60 bg-slate-900/60 p-4">

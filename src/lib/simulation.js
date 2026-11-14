@@ -28,6 +28,18 @@ export function batteryMax(s) {
   return s.modules.battery * CONSUMPTION.batteryMax
 }
 
+/**
+ * Clone the simulation state safely. `pendingEvent` holds functions (choice handlers),
+ * which structuredClone cannot copy — strip it before cloning, then re-attach the
+ * original reference (it's read-only; resolveEvent replaces it afterwards).
+ */
+function cloneSim(s) {
+  const { pendingEvent, ...rest } = s
+  const d = structuredClone(rest)
+  d.pendingEvent = pendingEvent ?? null
+  return d
+}
+
 export function isDaylight(s) {
   const sol = s.sol
   if (s.locationKey === 'moon') return sol % 28 === 0 ? false : sol % 28 <= 14
@@ -44,7 +56,7 @@ function clamp(v, lo, hi) {
  */
 export function tick(state) {
   if (state.status !== 'running') return state
-  const d = structuredClone(state)
+  const d = cloneSim(state)
   const loc = LOCATIONS[d.locationKey]
 
   // ---- Power ----
@@ -56,7 +68,8 @@ export function tick(state) {
   let demand =
     CONSUMPTION.basePower +
     d.modules.greenhouse * CONSUMPTION.greenhousePower +
-    (d.modules.recycler ? CONSUMPTION.recyclerPower : 0)
+    (d.modules.recycler ? CONSUMPTION.recyclerPower : 0) +
+    d.modules.oxygen * CONSUMPTION.oxygenPower
 
   let outage = false
   const maxB = batteryMax(d)
@@ -81,6 +94,14 @@ export function tick(state) {
   d.water -= waterUse
   d.food += foodProd - d.crew * CONSUMPTION.foodPerCrewPerSol
 
+  // O₂ generation via electrolysis (like the ISS: power + water → oxygen)
+  let o2Prod = 0
+  if (!outage && d.modules.oxygen > 0 && d.water > 15) {
+    o2Prod = d.modules.oxygen * CONSUMPTION.oxygenProd
+    d.water -= d.modules.oxygen * CONSUMPTION.oxygenWater
+    d.o2 += o2Prod
+  }
+
   // ---- Radiation ----
   const dose = loc.radiationMSvPerDay * (d.stormSols > 0 ? 1.2 : 1)
   d.totalDose += dose
@@ -103,7 +124,7 @@ export function tick(state) {
 
   d.log.unshift(
     `${loc.flag} ${loc.solLabel} ${d.sol}: power ${production >= demand ? '✅' : '⚠️'} ` +
-      `O₂ −${o2Use.toFixed(1)}kg, H₂O −${waterUse.toFixed(1)}L, dose +${dose.toFixed(1)} mSv` +
+      `O₂ −${o2Use.toFixed(1)}kg${o2Prod > 0 ? ` ⚗️+${o2Prod.toFixed(1)}kg` : ''}, H₂O −${waterUse.toFixed(1)}L, dose +${dose.toFixed(1)} mSv` +
       (outage ? ' · POWER OUTAGE!' : '') +
       (d.stormSols > 0 ? ' · 🌪️ dust storm' : ''),
   )
@@ -114,7 +135,7 @@ export function tick(state) {
 
   // ---- Roll a random event (not on the first two sols) ----
   let event = null
-  if (d.sol > 2 && Math.random() < 0.22) {
+  if (d.sol > 2 && Math.random() < 0.28) {
     const pool = EVENTS.filter((e) => e.condition(d))
     const total = pool.reduce((a, e) => a + e.weight, 0)
     let r = Math.random() * total
@@ -158,9 +179,9 @@ export function tick(state) {
 }
 
 export function resolveEvent(state, choiceIndex) {
-  const d = structuredClone(state)
-  const event = d.pendingEvent
-  if (!event) return d
+  const event = state.pendingEvent
+  if (!event) return state
+  const d = cloneSim(state)
   const loc = LOCATIONS[d.locationKey]
   const result = event.choices[choiceIndex].result(d, loc)
   d.pendingEvent = null
@@ -169,7 +190,7 @@ export function resolveEvent(state, choiceIndex) {
 }
 
 export function answerQuiz(state, optionIndex) {
-  const d = structuredClone(state)
+  const d = cloneSim(state)
   const q = d.pendingQuiz
   if (!q) return d
   const correct = optionIndex === q.answer
@@ -186,12 +207,33 @@ export function answerQuiz(state, optionIndex) {
 }
 
 export function buildModule(state, moduleId) {
-  const d = structuredClone(state)
+  const d = cloneSim(state)
   const m = MODULES[moduleId]
   if (d.credits < m.cost || d.modules[moduleId] >= m.max) return state
   d.credits -= m.cost
   d.modules[moduleId] += 1
   d.log.unshift(`🔧 Built ${m.name} (−${m.cost} credits).`)
+  return d
+}
+
+export function orderResupply(state) {
+  if (state.credits < 25 || state.status !== 'running') return state
+  const d = cloneSim(state)
+  d.credits -= 25
+  d.o2 += 30
+  d.water += 50
+  d.food += 40
+  d.log.unshift('📦 Resupply capsule arrived: O₂ +30kg, water +50L, food +40kg (−25 credits).')
+  return d
+}
+
+export function crewParty(state) {
+  if (state.credits < 10 || state.status !== 'running') return state
+  const d = cloneSim(state)
+  d.credits -= 10
+  d.morale = Math.min(100, d.morale + 15)
+  d.food -= 3
+  d.log.unshift('🎉 Movie night! Morale +15, food −3 (−10 credits).')
   return d
 }
 

@@ -50,9 +50,12 @@ export const CONSUMPTION = {
   o2PerCrewPerSol: 0.84, // kg
   waterPerCrewPerSol: 3.5, // L
   foodPerCrewPerSol: 1.83, // kg
-  basePower: 35, // units/sol for life support + habitat systems
-  greenhousePower: 12, // units/sol per greenhouse
-  recyclerPower: 6, // units/sol
+  basePower: 30, // units/sol for life support + habitat systems
+  greenhousePower: 10, // units/sol per greenhouse
+  recyclerPower: 5, // units/sol
+  oxygenPower: 8, // units/sol per O2 generator
+  oxygenWater: 1, // L water consumed per O2 generator per sol (electrolysis)
+  oxygenProd: 0.9, // kg O2 produced per O2 generator per sol
   startO2: 120, // kg stock
   startWater: 180, // L stock
   startFood: 160, // kg stock
@@ -82,6 +85,16 @@ export const MODULES = {
     output: 25,
     desc: 'Radioisotope thermoelectric generator — works day, night and in storms. Curiosity and Perseverance rovers power themselves this way.',
     effect: '⚡ +25 power/sol, always on',
+  },
+  oxygen: {
+    id: 'oxygen',
+    name: 'O₂ Generator',
+    icon: '⚗️',
+    cost: 35,
+    max: 2,
+    output: 0,
+    desc: 'Electrolysis like the ISS Oxygen Generation System: splits water into oxygen to breathe. Needs power and water stock.',
+    effect: '🫁 +0.9 O₂/sol each (uses ⚡8 + 💧1)',
   },
   battery: {
     id: 'battery',
@@ -323,7 +336,7 @@ export const EVENTS = [
     title: '📦 Supply Capsule Arrived!',
     text: 'A robotic cargo lander touched down safely with fresh supplies.',
     condition: () => true,
-    weight: 2,
+    weight: 3,
     choices: [
       {
         label: '📦 Take the supplies (O₂ +25, water +40, food +30)',
@@ -409,6 +422,20 @@ export const QUIZ = [
     answer: 0,
     why: 'Shipped food is finite — every kg costs thousands of dollars to land. Regenerative growth (like NASA’s Veggie experiments on the ISS) is key for long missions.',
   },
+]
+
+/** Rotating real NASA facts shown as tips during play. */
+export const TIPS = [
+  '💡 The ISS crew sees 16 sunrises and 16 sunsets every day — it orbits Earth every 90 minutes.',
+  '💡 NASA’s Curiosity and Perseverance rovers are powered by plutonium RTGs — just like our ☢️ module.',
+  '💡 Astronauts drink recycled water on the ISS — even from humidity in the cabin air and urine.',
+  '💡 A global dust storm silenced NASA’s Opportunity rover forever in 2018. Fly safe, commander!',
+  '💡 Some craters at the Moon’s south pole haven’t seen sunlight in billions of years — perfect for hunting ice.',
+  '💡 NASA’s Veggie experiment grew lettuce aboard the ISS in 2015 — the astronauts ate space salad!',
+  '💡 Sunsets on Mars are blue — its fine dust scatters light differently than Earth’s atmosphere.',
+  '💡 Radiation on the Martian surface is about 25× stronger than natural background radiation on Earth.',
+  '💡 A Martian sol is only 39 minutes longer than an Earth day — NASA engineers on rover teams live on “Mars time”.',
+  '💡 NASA is developing nuclear fission power for Artemis Moon bases — solar alone can’t survive the 14-day night.',
 ]
 
 /** Public NASA data sources used. Shown in the app and submitted with the project. */
