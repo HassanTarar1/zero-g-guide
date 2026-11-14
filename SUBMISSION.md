@@ -60,6 +60,8 @@ Everything below is ready to paste into the Space Apps project submission form.
 | Link Text | Link Url |
 |---|---|
 | NASA DONKI (Space Weather Database Of Notifications) — live solar flare & SEP advisories | https://api.nasa.gov |
+| NASA EPIC / DSCOVR — live full-disc Earth imagery from Sun–Earth L1 | https://epic.gsfc.nasa.gov |
+| NASA Mars Curiosity Rover Photos API — "Today on Mars" latest downlink | https://api.nasa.gov |
 | RAD Instrument, Curiosity Rover — Mars surface radiation dose (~0.7 mSv/day) | https://science.nasa.gov/mission/mars-science-laboratory-curiosity/ |
 | Lunar Reconnaissance Orbiter (CRaTER) — lunar radiation environment (~1.4 mSv/day) | https://science.nasa.gov/mission/lunar-reconnaissance-orbiter/ |
 | NASA NSSDC Mars Fact Sheet — insolation, temperature, sol length | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html |
@@ -68,6 +70,15 @@ Everything below is ready to paste into the Space Apps project submission form.
 | NASA-STD-3001 — astronaut career radiation limit basis | https://www.nasa.gov/nasa-standards/ |
 | NASA Astronomy Picture of the Day (APOD) API — live Cadet Briefing feature | https://api.nasa.gov |
 | NASA Image and Video Library API — live gallery feature | https://images.nasa.gov |
+
+### Space Agency Partner & Other Data (add under "Other Data")
+
+| Link Text | Link Url |
+|---|---|
+| NOAA Space Weather Prediction Center — real-time space-weather alert feed (ALERT/WARNING/WATCH) | https://www.swpc.noaa.gov/ |
+| wheretheiss.at — community ISS tracking telemetry (position, altitude, sunlight state) | https://wheretheiss.at/ |
+| P. Schlyter low-precision orbital elements method — Earth–Mars–Moon distances and light-delay math | https://stjarnhimlen.se/comp/ppcomp.html |
+| React 18 + Vite + Tailwind CSS (build tooling) | https://vitejs.dev/ |
 
 ## Super Intelligence (SI) disclosure
 

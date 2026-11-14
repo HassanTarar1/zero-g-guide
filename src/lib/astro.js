@@ -105,6 +105,55 @@ export async function fetchSEPEvents(days = 90, signal) {
   return r.json()
 }
 
+/** NOAA SWPC — official real-time space-weather alerts/warnings/watches (Space Agency Partner data). */
+export async function fetchNoaaAlerts(signal) {
+  const r = await fetch('https://services.swpc.noaa.gov/products/alerts.json', { signal })
+  if (!r.ok) throw new Error(`NOAA ${r.status}`)
+  return r.json() // [{ product_id, issue_datetime, message }]
+}
+
+/** NASA EPIC — latest full-disc Earth image from DSCOVR at Sun–Earth L1. */
+export async function fetchEpicEarth(signal) {
+  const r = await fetch('https://api.nasa.gov/EPIC/api/natural?api_key=DEMO_KEY', { signal })
+  if (!r.ok) throw new Error(`EPIC ${r.status}`)
+  const list = await r.json()
+  const latest = list?.[0]
+  if (!latest) throw new Error('EPIC empty')
+  const dt = latest.date.slice(0, 10).replaceAll('-', '/') // "YYYY/MM/DD"
+  return {
+    caption: latest.caption,
+    date: latest.date,
+    url: `https://epic.gsfc.nasa.gov/archive/natural/${dt}/jpg/${latest.image}.jpg`,
+  }
+}
+
+/** NASA Mars Curiosity rover — latest published photos. */
+export async function fetchCuriosityPhotos(signal) {
+  const r = await fetch('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/latest_photos?api_key=DEMO_KEY', { signal })
+  if (!r.ok) throw new Error(`Mars photos ${r.status}`)
+  const data = await r.json()
+  return (data?.latest_photos || []).slice(0, 3).map((p) => ({
+    img: p.img_src,
+    date: p.earth_date,
+    camera: p.camera?.full_name || '—',
+    sol: p.sol,
+  }))
+}
+
+/** Real Moon phase (mean synodic month, epoch 2000-01-06 18:14 UTC new moon). */
+export function moonPhase(date = new Date()) {
+  const synodic = 29.530588853 * DAY_MS
+  const epochNewMoon = Date.UTC(2000, 0, 6, 18, 14)
+  let frac = ((date.getTime() - epochNewMoon) % synodic) / synodic
+  if (frac < 0) frac += 1
+  const illum = (1 - Math.cos(2 * Math.PI * frac)) / 2
+  const names = ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent']
+  const name = names[Math.round(frac * 8) % 8]
+  const daysToNew = (1 - frac) * synodic / DAY_MS
+  const daysToFull = (frac < 0.5 ? 0.5 - frac : 1.5 - frac) * synodic / DAY_MS
+  return { frac, illum, name, daysToNew, daysToFull }
+}
+
 export function timeAgo(iso) {
   const ms = Date.now() - new Date(iso).getTime()
   const h = Math.floor(ms / 3_600_000)
