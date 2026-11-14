@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CONSUMPTION } from '../data/nasaData'
-import { fetchSolarFlares, timeAgo } from '../lib/astro'
+import { fetchSolarFlares, timeAgo, cachedFetch } from '../lib/astro'
 
 const ENVIRONMENTS = [
   { id: 'iss', label: 'ISS / LEO — hab day', dose: 0.5, hint: '≈0.5 mSv/day inside the station' },
@@ -12,6 +12,14 @@ const ENVIRONMENTS = [
 
 const LIMIT = CONSUMPTION.radiationCareerLimitMSv
 const STORE_KEY = 'zgg-dose-log'
+
+const PRESETS = [
+  ['🧪 1 week on Mars', 'mars', 7],
+  ['🧪 30 days on ISS', 'iss', 30],
+  ['🚪 1 EVA', 'eva', 1],
+  ['⚡ 1 SEP event', 'spe', 1],
+  ['🌕 1 week on Moon', 'moon', 7],
+]
 
 export default function Radiation() {
   const [entries, setEntries] = useState(() => {
@@ -26,7 +34,7 @@ export default function Radiation() {
   useEffect(() => {
     let cancelled = false
     const ctrl = new AbortController()
-    fetchSolarFlares(30, ctrl.signal)
+    cachedFetch('flr30', () => fetchSolarFlares(30, ctrl.signal))
       .then((f) => { if (!cancelled) setFlares(f) })
       .catch(() => { if (!cancelled) setFlares('err') })
     return () => { cancelled = true; ctrl.abort() }
@@ -36,8 +44,9 @@ export default function Radiation() {
   const pct = Math.min(100, (total / LIMIT) * 100)
   const selected = ENVIRONMENTS.find((e) => e.id === env)
 
-  const add = () => {
-    setEntries([{ id: Date.now(), env: selected.id, label: selected.label, dose: selected.dose, count: Math.max(1, Number(days) || 1), date: new Date().toISOString() }, ...entries])
+  const addEntry = (envId, count) => {
+    const e = ENVIRONMENTS.find((x) => x.id === envId)
+    setEntries((prev) => [{ id: Date.now() + Math.random(), env: e.id, label: e.label, dose: e.dose, count: Math.max(1, Number(count) || 1), date: new Date().toISOString() }, ...prev])
   }
 
   const recentBigFlare = flares && flares !== 'err' && flares.length && /X|M/.test(flares[0].classType)
@@ -82,7 +91,22 @@ export default function Radiation() {
         {/* Add entry */}
         <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 backdrop-blur">
           <h3 className="font-display text-sm font-bold tracking-wide text-white">LOG EXPOSURE</h3>
-          <label className="mt-3 block text-xs font-semibold text-slate-400">Environment / event</label>
+
+          {/* Quick presets */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {PRESETS.map(([label, envId, count]) => (
+              <button
+                key={label}
+                onClick={() => addEntry(envId, count)}
+                className="rounded-full border border-slate-600 bg-slate-950/50 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-[10px] text-slate-500">Presets add a realistic mission-week of exposure in one tap.</p>
+
+          <label className="mt-4 block text-xs font-semibold text-slate-400">Environment / event</label>
           <select
             value={env}
             onChange={(e) => setEnv(e.target.value)}
@@ -98,7 +122,7 @@ export default function Radiation() {
             className="mt-1 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-2.5 text-white outline-none focus:border-cyan-400"
           />
           <button
-            onClick={add}
+            onClick={() => addEntry(env, days)}
             className="mt-4 w-full rounded-xl bg-cyan-500 py-3 font-bold text-slate-950 transition hover:bg-cyan-400"
           >
             + Add {(selected.dose * (Number(days) || 1)).toFixed(1)} mSv to ledger

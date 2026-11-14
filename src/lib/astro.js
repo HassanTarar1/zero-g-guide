@@ -161,3 +161,18 @@ export function timeAgo(iso) {
   if (h < 24) return `${h} h ago`
   return `${Math.floor(h / 24)} d ago`
 }
+
+/**
+ * localStorage-backed fetch cache so live feeds (NOAA, DONKI, EPIC, Mars photos)
+ * are not hammered on every screen visit — keeps us inside api.nasa.gov DEMO_KEY
+ * rate limits and makes the dashboard resilient.
+ */
+export async function cachedFetch(key, fn, ttlMs = 5 * 60_000) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(`zgg-cache-${key}`))
+    if (cached && Date.now() - cached.t < ttlMs) return cached.v
+  } catch { /* ignore corrupt cache */ }
+  const v = await fn()
+  try { localStorage.setItem(`zgg-cache-${key}`, JSON.stringify({ t: Date.now(), v })) } catch { /* quota */ }
+  return v
+}
